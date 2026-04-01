@@ -1,0 +1,818 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:eskd-core="http://gost.ru/eskd/core/2024"
+           xmlns:eskd-bind="http://gost.ru/eskd/binding/2024"
+           xmlns:eskd-pi="http://gost.ru/eskd/profile/interface/2024"
+           xmlns:eskd-ekb="http://gost.ru/eskd/profile/ekb/2024"
+           targetNamespace="http://gost.ru/eskd/profile/ekb/2024"
+           elementFormDefault="qualified"
+           attributeFormDefault="unqualified"
+           version="0.2"
+           xml:lang="ru"
+           xmlns:vc="http://www.w3.org/2007/XMLSchema-versioning"
+           vc:minVersion="1.1">
+
+  <xs:import namespace="http://gost.ru/eskd/core/2024"
+             schemalocation="../core/eskd_core.xsd"/>
+  <xs:import namespace="http://gost.ru/eskd/binding/2024"
+             schemaLocation="eskd_binding.xsd"/>
+  <xs:import namespace="http://gost.ru/eskd/profile/interface/2024"
+             schemaLocation="eskd_profile_interface.xsd"/>
+
+  <xs:annotation>
+    <xs:documentation>
+      ============================================================================
+      ПРОФИЛЬ ИНТЕРОПЕРАБЕЛЬНОСТИ: РАЗРЕШЁННЫЕ ПЕРЕЧНИ ЭКБ/РЭА
+      ============================================================================
+      Основано на:
+      - ГОСТ Р 77.403 (Профили интероперабельности)
+      - ГОСТ Р 2.525-2024 (Электронная структура изделия)
+      - ГОСТ Р 2.058-2023 (Реквизитная часть КД)
+      - ГОСТ Р 77.302 (Общие данные об изделии)
+      - ГОСТ Р 77.305 (Материалы и их свойства)
+      - ГОСТ Р 77.402 (Программные средства поддержки ЖЦ)
+      
+      Область применения:
+      - Обмен данными о разрешённых перечнях электронной компонентной базы (ЭКБ)
+      - Обмен данными о разрешённой радиоэлектронной аппаратуре (РЭА)
+      - Проверка соответствия изделий разрешённым перечням
+      - Управление допустимыми заменами компонентов
+      
+      Уровни интероперабельности (ГОСТ Р 77.403):
+      - Семантический: единая модель данных перечней ЭКБ/РЭА
+      - Технический: форматы XML + XSD 1.1
+      ============================================================================
+    </xs:documentation>
+  </xs:annotation>
+
+  <!-- ========================================================================
+       РАЗДЕЛ 1: ПРОСТЫЕ ТИПЫ (СПЕЦИФИЧНЫЕ ДЛЯ ЭКБ/РЭА)
+       ======================================================================== -->
+
+  <xs:simpleType name="ApprovalStatusEnum">
+    <xs:annotation>
+      <xs:documentation>Статус допуска компонента в разрешённый перечень</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="approved">
+        <xs:annotation><xs:documentation>Разрешён к применению без ограничений</xs:documentation></xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="conditionally">
+        <xs:annotation><xs:documentation>Условно разрешён (с ограничениями)</xs:documentation></xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="restricted">
+        <xs:annotation><xs:documentation>Ограниченно допустим (только для определённых применений)</xs:documentation></xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="deprecated">
+        <xs:annotation><xs:documentation>Не рекомендуется к новому применению</xs:documentation></xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="prohibited">
+        <xs:annotation><xs:documentation>Запрещён к применению</xs:documentation></xs:annotation>
+      </xs:enumeration>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="EquivalenceCategoryEnum">
+    <xs:annotation>
+      <xs:documentation>Категория эквивалентности компонента</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="original">
+        <xs:annotation><xs:documentation>Оригинальный компонент</xs:documentation></xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="domestic_analog">
+        <xs:annotation><xs:documentation>Отечественный аналог</xs:documentation></xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="foreign_analog">
+        <xs:annotation><xs:documentation>Иностранный аналог</xs:documentation></xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="functional_substitute">
+        <xs:annotation><xs:documentation>Функциональная замена</xs:documentation></xs:annotation>
+      </xs:enumeration>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="ComplianceLevelEnum">
+    <xs:annotation>
+      <xs:documentation>Уровень соответствия изделия разрешённому перечню</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="full">
+        <xs:annotation><xs:documentation>Полное соответствие (100% компонентов из перечня)</xs:documentation></xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="partial">
+        <xs:annotation><xs:documentation>Частичное соответствие (с исключениями)</xs:documentation></xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="not_verified">
+        <xs:annotation><xs:documentation>Не проверено</xs:documentation></xs:annotation>
+      </xs:enumeration>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="ComponentCriticalityEnum">
+    <xs:annotation>
+      <xs:documentation>Критичность компонента для функционирования изделия</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="critical">
+        <xs:annotation><xs:documentation>Критичный (отказ приводит к отказу изделия)</xs:documentation></xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="important">
+        <xs:annotation><xs:documentation>Важный (влияет на характеристики)</xs:documentation></xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="standard">
+        <xs:annotation><xs:documentation>Стандартный (общее применение)</xs:documentation></xs:annotation>
+      </xs:enumeration>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="QualificationLevelEnum">
+    <xs:annotation>
+      <xs:documentation>Уровень квалификации компонента</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="OT">
+        <xs:annotation><xs:documentation>Общепромышленное исполнение</xs:documentation></xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="VP">
+        <xs:annotation><xs:documentation>Военное исполнение</xs:documentation></xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="SPACE">
+        <xs:annotation><xs:documentation>Космическое исполнение</xs:documentation></xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="AUTO">
+        <xs:annotation><xs:documentation>Автомобильное исполнение</xs:documentation></xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="MEDICAL">
+        <xs:annotation><xs:documentation>Медицинское исполнение</xs:documentation></xs:annotation>
+      </xs:enumeration>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <!-- ========================================================================
+       РАЗДЕЛ 2: РАЗРЕШЁННЫЙ ПЕРЕЧЕНЬ (ALLOWED COMPONENT LIST)
+       ======================================================================== -->
+
+  <xs:complexType name="AllowedComponentListType">
+    <xs:annotation>
+      <xs:documentation>
+        Нормативно утверждённый перечень разрешённой ЭКБ/РЭА.
+        Наследует от eskd-core:BaseEntityType.
+        
+        Согласно ГОСТ Р 77.302, перечень является частью общих данных об изделии
+        и используется для проверки применяемости компонентов.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="eskd-core:BaseEntityType">
+        <xs:sequence>
+          <xs:element name="listId" type="eskd-core:Designator" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>
+                Обозначение перечня (обязательно).
+                Пример: "ПЛ-ЭКБ-2024-001"
+              </xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="listName" type="eskd-core:ShortText" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Наименование перечня</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="approvalDocument" type="eskd-ekb:DocumentReferenceType" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>
+                Ссылка на нормативный документ об утверждении перечня.
+                Пример: приказ, протокол, решение.
+              </xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="issuingAuthority" type="xs:IDREF" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>
+                Ссылка на организацию - орган утверждения.
+                Может ссылаться на organization из 2.058 модуля.
+              </xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="effectiveDate" type="eskd-core:DateType" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Дата вступления в силу</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="expirationDate" type="eskd-core:DateType" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Дата окончания действия (если применимо)</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="scopeDescription" type="eskd-core:LongText" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Область применения перечня</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="applicableProducts" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Изделия, для которых применяется перечень</xs:documentation>
+            </xs:annotation>
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="productRef" type="xs:IDREF" minOccurs="0" maxOccurs="unbounded">
+                  <xs:annotation>
+                    <xs:documentation>
+                      Ссылка на eskd_product (2.525).
+                    </xs:documentation>
+                  </xs:annotation>
+                </xs:element>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+          
+          <xs:element name="allowedItems" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Позиции разрешённого перечня</xs:documentation>
+            </xs:annotation>
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="allowedItem" type="eskd-ekb:AllowedComponentItemType" 
+                           minOccurs="1" maxOccurs="unbounded"/>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:element name="allowed_component_list" type="eskd-ekb:AllowedComponentListType">
+    <xs:annotation>
+      <xs:documentation>Экземпляр разрешённого перечня ЭКБ/РЭА</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+
+  <!-- ========================================================================
+       РАЗДЕЛ 3: ПОЗИЦИЯ ПЕРЕЧНЯ (ALLOWED COMPONENT ITEM)
+       ======================================================================== -->
+
+  <xs:complexType name="AllowedComponentItemType">
+    <xs:annotation>
+      <xs:documentation>
+        Позиция разрешённого перечня.
+        Связывает компонент с условиями применения.
+        Наследует от eskd-core:BaseEntityType.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="eskd-core:BaseEntityType">
+        <xs:sequence>
+          <xs:element name="itemId" type="eskd-core:CodeString" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Идентификатор позиции в перечне</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="componentRef" type="xs:IDREF" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>
+                Ссылка на компонент (ekb_component или eskd_product из 2.525).
+              </xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="approvalStatus" type="eskd-ekb:ApprovalStatusEnum" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Статус допуска (обязательно)</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="equivalenceCategory" type="eskd-ekb:EquivalenceCategoryEnum" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Категория эквивалентности</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="manufacturer" type="xs:IDREF" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>
+                Ссылка на организацию-производителя (organization из 2.058).
+              </xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="countryOfOrigin" type="eskd-core:CodeString" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Страна происхождения (код ОК 025-2002)</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="applicationConstraints" type="eskd-core:LongText" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Ограничения применения</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="operatingConditions" type="eskd-core:LongText" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Допустимые условия эксплуатации</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="associatedReplacementGroupRef" type="xs:IDREF" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Ссылка на группу допустимых замен</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="qualificationStatus" type="eskd-ekb:QualificationLevelEnum" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Статус квалификации компонента</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="criticality" type="eskd-ekb:ComponentCriticalityEnum" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Критичность компонента</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="testReportRef" type="xs:IDREF" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>
+                Ссылка на отчёт об испытаниях (document из 2.525).
+              </xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="notes" type="eskd-core:LongText" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Дополнительные примечания</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:element name="allowed_component_item" type="eskd-ekb:AllowedComponentItemType">
+    <xs:annotation>
+      <xs:documentation>Экземпляр позиции разрешённого перечня</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+
+  <!-- ========================================================================
+       РАЗДЕЛ 4: ГРУППА ДОПУСТИМЫХ ЗАМЕН (REPLACEMENT GROUP)
+       ======================================================================== -->
+
+  <xs:complexType name="ReplacementGroupType">
+    <xs:annotation>
+      <xs:documentation>
+        Группа допустимых замен составной части.
+        Наследует от eskd-core:BaseEntityType.
+        Интегрируется с assembly_component_usage_substitute из 2.525.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="eskd-core:BaseEntityType">
+        <xs:sequence>
+          <xs:element name="groupId" type="eskd-core:CodeString" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Идентификатор группы замен</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="baseComponentRef" type="xs:IDREF" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>
+                Ссылка на базовый компонент (основное вхождение).
+              </xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="replacementReason" type="eskd-core:LongText" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Причина формирования группы замен</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="replacementItems" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Список допустимых замен</xs:documentation>
+            </xs:annotation>
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="replacementItem" type="eskd-ekb:ReplacementItemType" 
+                           minOccurs="1" maxOccurs="unbounded"/>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:element name="replacement_group" type="eskd-ekb:ReplacementGroupType">
+    <xs:annotation>
+      <xs:documentation>Экземпляр группы допустимых замен</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+
+  <xs:complexType name="ReplacementItemType">
+    <xs:annotation>
+      <xs:documentation>
+        Конкретная допустимая замена в группе.
+        Наследует от eskd-core:BaseEntityType.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="eskd-core:BaseEntityType">
+        <xs:sequence>
+          <xs:element name="replacementProductRef" type="xs:IDREF" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Ссылка на заменяющий компонент</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="priority" type="eskd-core:PositiveInteger" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Приоритет применения (1 = высший)</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="equivalenceLevel" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Уровень эквивалентности замены</xs:documentation>
+            </xs:annotation>
+            <xs:simpleType>
+              <xs:restriction base="xs:string">
+                <xs:enumeration value="full">
+                  <xs:annotation><xs:documentation>Полная эквивалентность</xs:documentation></xs:annotation>
+                </xs:enumeration>
+                <xs:enumeration value="partial">
+                  <xs:annotation><xs:documentation>Частичная эквивалентность</xs:documentation></xs:annotation>
+                </xs:enumeration>
+                <xs:enumeration value="functional">
+                  <xs:annotation><xs:documentation>Функциональная эквивалентность</xs:documentation></xs:annotation>
+                </xs:enumeration>
+                <xs:enumeration value="temporary">
+                  <xs:annotation><xs:documentation>Временная замена</xs:documentation></xs:annotation>
+                </xs:enumeration>
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:element>
+          
+          <xs:element name="usageConditions" type="eskd-core:LongText" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Условия применения замены</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="approvalDocumentRef" type="xs:IDREF" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>
+                Ссылка на документ-основание замены (document из 2.525).
+              </xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="impactAnalysis" type="eskd-core:LongText" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Анализ влияния замены на изделие</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:element name="replacement_item" type="eskd-ekb:ReplacementItemType">
+    <xs:annotation>
+      <xs:documentation>Экземпляр допустимой замены</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+
+  <!-- ========================================================================
+       РАЗДЕЛ 5: ДЕКЛАРАЦИЯ СООТВЕТСТВИЯ (COMPLIANCE ASSERTION)
+       ======================================================================== -->
+
+  <xs:complexType name="ComplianceAssertionType">
+    <xs:annotation>
+      <xs:documentation>
+        Декларация соответствия изделия разрешённому перечню ЭКБ/РЭА.
+        Наследует от eskd-core:BaseEntityType.
+        Используется для автоматизированной проверки интероперабельности.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="eskd-core:BaseEntityType">
+        <xs:sequence>
+          <xs:element name="assertionId" type="eskd-core:CodeString" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Идентификатор декларации</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="productRef" type="xs:IDREF" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>
+                Ссылка на изделие (eskd_product из 2.525).
+              </xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="allowedListRef" type="xs:IDREF" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Ссылка на разрешённый перечень</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="complianceLevel" type="eskd-ekb:ComplianceLevelEnum" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Уровень соответствия</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="nonCompliantItems" type="eskd-core:LongText" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>
+                Перечень несоответствующих компонентов (если complianceLevel = partial).
+              </xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="verificationDate" type="eskd-core:DateType" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Дата проверки соответствия</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="verifierRef" type="xs:IDREF" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>
+                Ссылка на организацию/лицо, выполнившее проверку.
+                Может ссылаться на organization (2.058) или person (2.058).
+              </xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="verificationMethod" type="eskd-core:ShortText" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Метод проверки (автоматическая, ручная, смешанная)</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="validUntil" type="eskd-core:DateType" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Срок действия декларации</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:element name="compliance_assertion" type="eskd-ekb:ComplianceAssertionType">
+    <xs:annotation>
+      <xs:documentation>Экземпляр декларации соответствия</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+
+  <!-- ========================================================================
+       РАЗДЕЛ 6: ССЫЛКИ И КОНТЕКСТЫ
+       ======================================================================== -->
+
+  <xs:complexType name="DocumentReferenceType">
+    <xs:annotation>
+      <xs:documentation>
+        Ссылка на документ (нормативный, распорядительный).
+        Интегрируется с document (2.525) и doc_requisite (2.058).
+      </xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="documentRef" type="xs:IDREF" minOccurs="1" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>
+            Ссылка на документ в 2.525 или 2.058.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      
+      <xs:element name="documentVersionRef" type="xs:IDREF" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>Ссылка на конкретную версию документа</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      
+      <xs:element name="fragmentRef" type="eskd-core:CodeString" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>Ссылка на фрагмент документа (раздел, пункт)</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <!-- ========================================================================
+       РАЗДЕЛ 7: КОРНЕВОЙ ЭЛЕМЕНТ ПРОФИЛЯ
+       ======================================================================== -->
+
+  <xs:element name="EkbProfileRoot" substitutionGroup="eskd-pi:ProfileRoot">
+    <xs:annotation>
+      <xs:documentation>
+        Корневой элемент профиля ЭКБ/РЭА.
+        Наследует от абстрактного ProfileRoot через substitutionGroup.
+        Соответствует контракту профиля интероперабельности (eskd_profile_interface.xsd).
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="eskd-pi:ProfileRootType">
+          <xs:sequence>
+            <!-- Доменные элементы профиля ЭКБ/РЭА -->
+            <xs:element name="allowedComponentLists" minOccurs="0" maxOccurs="1">
+              <xs:annotation>
+                <xs:documentation>Разрешённые перечни ЭКБ/РЭА</xs:documentation>
+              </xs:annotation>
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element ref="eskd-ekb:allowed_component_list" minOccurs="0" maxOccurs="unbounded"/>
+                  <xs:element ref="eskd-ekb:allowed_component_item" minOccurs="0" maxOccurs="unbounded"/>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+            
+            <xs:element name="replacementGroups" minOccurs="0" maxOccurs="1">
+              <xs:annotation>
+                <xs:documentation>Группы допустимых замен</xs:documentation>
+              </xs:annotation>
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element ref="eskd-ekb:replacement_group" minOccurs="0" maxOccurs="unbounded"/>
+                  <xs:element ref="eskd-ekb:replacement_item" minOccurs="0" maxOccurs="unbounded"/>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+            
+            <xs:element name="complianceAssertions" minOccurs="0" maxOccurs="1">
+              <xs:annotation>
+                <xs:documentation>Декларации соответствия</xs:documentation>
+              </xs:annotation>
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element ref="eskd-ekb:compliance_assertion" minOccurs="0" maxOccurs="unbounded"/>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+  <!-- ========================================================================
+       КЛЮЧИ ДЛЯ ВАЛИДАЦИИ ССЫЛОК (XSD 1.1 key/keyref)
+       ======================================================================== -->
+
+  <xs:element name="EkbProfileRoot">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="eskd-pi:ProfileRootType">
+          <xs:sequence>
+            <xs:element name="allowedComponentLists" minOccurs="0">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element ref="eskd-ekb:allowed_component_list" maxOccurs="unbounded"/>
+                  <xs:element ref="eskd-ekb:allowed_component_item" maxOccurs="unbounded"/>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+            <xs:element name="replacementGroups" minOccurs="0">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element ref="eskd-ekb:replacement_group" maxOccurs="unbounded"/>
+                  <xs:element ref="eskd-ekb:replacement_item" maxOccurs="unbounded"/>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+            <xs:element name="complianceAssertions" minOccurs="0">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element ref="eskd-ekb:compliance_assertion" maxOccurs="unbounded"/>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+
+    <!-- Ключи профиля -->
+    <xs:key name="EkbAllowedListKey">
+      <xs:selector xpath="eskd-ekb:allowedComponentLists/eskd-ekb:allowed_component_list"/>
+      <xs:field xpath="@id"/>
+    </xs:key>
+
+    <xs:key name="EkbAllowedItemKey">
+      <xs:selector xpath="eskd-ekb:allowedComponentLists/eskd-ekb:allowed_component_item"/>
+      <xs:field xpath="@id"/>
+    </xs:key>
+
+    <xs:key name="EkbReplacementGroupKey">
+      <xs:selector xpath="eskd-ekb:replacementGroups/eskd-ekb:replacement_group"/>
+      <xs:field xpath="@id"/>
+    </xs:key>
+
+    <xs:key name="EkbComplianceKey">
+      <xs:selector xpath="eskd-ekb:complianceAssertions/eskd-ekb:compliance_assertion"/>
+      <xs:field xpath="@id"/>
+    </xs:key>
+
+    <!-- Keyref: компонент в позиции перечня -->
+    <xs:keyref name="EkbAllowedItem_ComponentRef" refer="eskd-bind:Binding_ProductKey">
+      <xs:selector xpath="eskd-ekb:allowedComponentLists/eskd-ekb:allowed_component_item"/>
+      <xs:field xpath="eskd-ekb:componentRef"/>
+    </xs:keyref>
+
+    <!-- Keyref: замена ссылается на компонент -->
+    <xs:keyref name="EkbReplacement_ProductRef" refer="eskd-bind:Binding_ProductKey">
+      <xs:selector xpath="eskd-ekb:replacementGroups/eskd-ekb:replacement_item"/>
+      <xs:field xpath="eskd-ekb:replacementProductRef"/>
+    </xs:keyref>
+
+    <!-- Keyref: декларация ссылается на изделие -->
+    <xs:keyref name="EkbCompliance_ProductRef" refer="eskd-bind:Binding_ProductKey">
+      <xs:selector xpath="eskd-ekb:complianceAssertions/eskd-ekb:compliance_assertion"/>
+      <xs:field xpath="eskd-ekb:productRef"/>
+    </xs:keyref>
+
+    <!-- Keyref: декларация ссылается на перечень -->
+    <xs:keyref name="EkbCompliance_ListRef" refer="eskd-ekb:EkbAllowedListKey">
+      <xs:selector xpath="eskd-ekb:complianceAssertions/eskd-ekb:compliance_assertion"/>
+      <xs:field xpath="eskd-ekb:allowedListRef"/>
+    </xs:keyref>
+
+    <!-- Keyref: орган утверждения -->
+    <xs:keyref name="EkbList_AuthorityRef" refer="eskd-bind:Binding_Organization2058Key">
+      <xs:selector xpath="eskd-ekb:allowedComponentLists/eskd-ekb:allowed_component_list"/>
+      <xs:field xpath="eskd-ekb:issuingAuthority"/>
+    </xs:keyref>
+  </xs:element>
+
+  <!-- ========================================================================
+       ПРАВИЛА ВАЛИДАЦИИ (XSD 1.1 assert)
+       ======================================================================== -->
+
+  <xs:assert test="every $item in eskd-ekb:allowedComponentLists/eskd-ekb:allowed_component_item satisfies 
+                   (exists(//eskd-2525:eskd_product[@id = $item/eskd-ekb:componentRef]) or 
+                    exists(//eskd-ekb:allowed_component_list/eskd-ekb:componentRef))">
+    <xs:annotation>
+      <xs:documentation>
+        Каждая позиция перечня должна ссылаться на существующий компонент.
+      </xs:documentation>
+    </xs:annotation>
+  </xs:assert>
+
+  <xs:assert test="every $assertion in eskd-ekb:complianceAssertions/eskd-ekb:compliance_assertion satisfies 
+                   ($assertion/eskd-ekb:complianceLevel != 'partial' or 
+                    exists($assertion/eskd-ekb:nonCompliantItems))">
+    <xs:annotation>
+      <xs:documentation>
+        При уровне соответствия 'partial' должен быть заполнен перечень 
+        несоответствующих компонентов.
+      </xs:documentation>
+    </xs:annotation>
+  </xs:assert>
+
+  <xs:assert test="every $list in eskd-ekb:allowedComponentLists/eskd-ekb:allowed_component_list satisfies 
+                   (not($list/eskd-ekb:expirationDate) or 
+                    $list/eskd-ekb:expirationDate &gt;= $list/eskd-ekb:effectiveDate)">
+    <xs:annotation>
+      <xs:documentation>
+        Дата окончания действия перечня не может быть раньше даты вступления в силу.
+      </xs:documentation>
+    </xs:annotation>
+  </xs:assert>
+
+  <xs:assert test="every $group in eskd-ekb:replacementGroups/eskd-ekb:replacement_group satisfies 
+                   (count($group/eskd-ekb:replacementItems/eskd-ekb:replacementItem) &gt;= 1)">
+    <xs:annotation>
+      <xs:documentation>
+        Каждая группа замен должна содержать хотя бы одну замену.
+      </xs:documentation>
+    </xs:annotation>
+  </xs:assert>
+
+  <xs:assert test="every $item in eskd-ekb:replacementGroups/eskd-ekb:replacement_item satisfies 
+                   ($item/eskd-ekb:priority &gt;= 1)">
+    <xs:annotation>
+      <xs:documentation>
+        Приоритет замены должен быть положительным числом (1 = высший).
+      </xs:documentation>
+    </xs:annotation>
+  </xs:assert>
+
+</xs:schema>

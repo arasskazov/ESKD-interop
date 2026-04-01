@@ -1,0 +1,1344 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:eskd-core="http://gost.ru/eskd/core/2024"
+           xmlns:eskd-2058="http://gost.ru/eskd/2.058/2023"
+           targetNamespace="http://gost.ru/eskd/2.058/2023"
+           elementFormDefault="qualified"
+           attributeFormDefault="unqualified"
+           version="0.2"
+           xml:lang="ru"
+           xmlns:vc="http://www.w3.org/2007/XMLSchema-versioning"
+           vc:minVersion="1.1">
+
+  <xs:import namespace="http://gost.ru/eskd/core/2024"
+             schemaLocation="../core/eskd_core.xsd"/>
+
+  <xs:annotation>
+    <xs:documentation>
+      ============================================================================
+      МОДУЛЬ РЕКВИЗИТОВ ДОКУМЕНТОВ (ГОСТ Р 2.058-2023)
+      ============================================================================
+      Основано на:
+      - ГОСТ Р 2.058-2023 (Реквизитная часть электронных конструкторских документов)
+      - ГОСТ Р 2.104 (Основные надписи)
+      - ГОСТ Р 2.051 (Электронные документы)
+      - ГОСТ Р 77.302 (Общие данные об изделии)
+      
+      Этот модуль описывает реквизитную часть КД:
+      - Реквизиты документов (designator, title, legal_owner)
+      - Версии и изменения (version, revision, directive_ref)
+      - Действия с КД (doc_handling, handling_person, person_signature)
+      - Состояния КД (status, status_type, status_date)
+      - Применяемость (applicability, litera, restriction)
+      - Организации и лица
+      ============================================================================
+    </xs:documentation>
+  </xs:annotation>
+
+  <!-- ========================================================================
+       РАЗДЕЛ 1: ПРОСТЫЕ ТИПЫ (СПЕЦИФИЧНЫЕ ДЛЯ 2.058)
+       ======================================================================== -->
+
+  <xs:simpleType name="DocHandlingTypeEnum">
+    <xs:annotation>
+      <xs:documentation>
+        Тип действия с документом (ГОСТ Р 2.058-2023, табл. 1).
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="DEVELOPMENT">
+        <xs:annotation><xs:documentation>Разработка</xs:documentation></xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="REVISION">
+        <xs:annotation><xs:documentation>Пересмотр</xs:documentation></xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="APPROVAL">
+        <xs:annotation><xs:documentation>Согласование</xs:documentation></xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="RELEASE">
+        <xs:annotation><xs:documentation>Выпуск</xs:documentation></xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="CANCEL">
+        <xs:annotation><xs:documentation>Аннулирование</xs:documentation></xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="RESTORE">
+        <xs:annotation><xs:documentation>Восстановление</xs:documentation></xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="TRANSFER">
+        <xs:annotation><xs:documentation>Передача</xs:documentation></xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="DESTRUCTION">
+        <xs:annotation><xs:documentation>Уничтожение</xs:documentation></xs:annotation>
+      </xs:enumeration>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="SignatureTypeEnum">
+    <xs:annotation>
+      <xs:documentation>
+        Тип подписи (ГОСТ Р 2.058-2023).
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="ORIGINAL">
+        <xs:annotation><xs:documentation>Подлинник</xs:documentation></xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="COPY">
+        <xs:annotation><xs:documentation>Копия</xs:documentation></xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="ELECTRONIC">
+        <xs:annotation><xs:documentation>Электронная подпись</xs:documentation></xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="ENHANCED_ELECTRONIC">
+        <xs:annotation><xs:documentation>Усиленная электронная подпись</xs:documentation></xs:annotation>
+      </xs:enumeration>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="StatusTypeEnum">
+    <xs:annotation>
+      <xs:documentation>
+        Тип состояния документа (ГОСТ Р 2.058-2023, табл. 4).
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="DRAFT">
+        <xs:annotation><xs:documentation>Черновик</xs:documentation></xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="IN_REVIEW">
+        <xs:annotation><xs:documentation>На согласовании</xs:documentation></xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="APPROVED">
+        <xs:annotation><xs:documentation>Утвержден</xs:documentation></xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="RELEASED">
+        <xs:annotation><xs:documentation>Выпущен</xs:documentation></xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="OBSOLETE">
+        <xs:annotation><xs:documentation>Устарел</xs:documentation></xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="CANCELLED">
+        <xs:annotation><xs:documentation>Аннулирован</xs:documentation></xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="ARCHIVED">
+        <xs:annotation><xs:documentation>Архивирован</xs:documentation></xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="REPLACED">
+        <xs:annotation><xs:documentation>Заменен</xs:documentation></xs:annotation>
+      </xs:enumeration>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="LiteraEnum">
+    <xs:annotation>
+      <xs:documentation>
+        Литера стадии разработки (ГОСТ 2.103).
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="A">
+        <xs:annotation><xs:documentation>Стадия А (Техническое предложение)</xs:documentation></xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="B">
+        <xs:annotation><xs:documentation>Стадия Б (Эскизный проект)</xs:documentation></xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="C">
+        <xs:annotation><xs:documentation>Стадия В (Технический проект)</xs:documentation></xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="D">
+        <xs:annotation><xs:documentation>Стадия Г (Рабочая документация)</xs:documentation></xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="E">
+        <xs:annotation><xs:documentation>Стадия Д (Опытный образец)</xs:documentation></xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="I">
+        <xs:annotation><xs:documentation>Стадия И (Серийное производство)</xs:documentation></xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="O">
+        <xs:annotation><xs:documentation>Стадия О (Массовое производство)</xs:documentation></xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="P">
+        <xs:annotation><xs:documentation>Стадия П (Ремонт)</xs:documentation></xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="T">
+        <xs:annotation><xs:documentation>Стадия Т (Утилизация)</xs:documentation></xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="X">
+        <xs:annotation><xs:documentation>Стадия Х (Прочее)</xs:documentation></xs:annotation>
+      </xs:enumeration>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="DirectiveTypeEnum">
+    <xs:annotation>
+      <xs:documentation>
+        Тип распорядительного документа (ГОСТ Р 2.058-2023).
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="ORDER">
+        <xs:annotation><xs:documentation>Приказ</xs:documentation></xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="DIRECTIVE">
+        <xs:annotation><xs:documentation>Распоряжение</xs:documentation></xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="DECISION">
+        <xs:annotation><xs:documentation>Решение</xs:documentation></xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="PROTOCOL">
+        <xs:annotation><xs:documentation>Протокол</xs:documentation></xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="OTHER">
+        <xs:annotation><xs:documentation>Другой тип</xs:documentation></xs:annotation>
+      </xs:enumeration>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="ApplicabilityTypeEnum">
+    <xs:annotation>
+      <xs:documentation>
+        Тип применяемости (ГОСТ Р 2.058-2023).
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="SERIAL">
+        <xs:annotation><xs:documentation>Серийное применение</xs:documentation></xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="EXPERIMENTAL">
+        <xs:annotation><xs:documentation>Опытное применение</xs:documentation></xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="SINGLE">
+        <xs:annotation><xs:documentation>Единичное применение</xs:documentation></xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="REPAIR">
+        <xs:annotation><xs:documentation>Ремонтное применение</xs:documentation></xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="MODERNIZATION">
+        <xs:annotation><xs:documentation>Модернизация</xs:documentation></xs:annotation>
+      </xs:enumeration>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="DocFormEnum">
+    <xs:annotation>
+      <xs:documentation>
+        Форма представления исходного КД (ГОСТ Р 2.058-2023, п. 12.3).
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="ELECTRONIC">
+        <xs:annotation><xs:documentation>Электронная форма</xs:documentation></xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="PAPER">
+        <xs:annotation><xs:documentation>Бумажная форма</xs:documentation></xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="BOTH">
+        <xs:annotation><xs:documentation>Обе формы</xs:documentation></xs:annotation>
+      </xs:enumeration>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="ProjectionMethodEnum">
+    <xs:annotation>
+      <xs:documentation>
+        Метод проецирования (ГОСТ Р 2.058-2023, п. 16.6).
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="FIRST_ANGLE">
+        <xs:annotation><xs:documentation>Метод первого угла</xs:documentation></xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="THIRD_ANGLE">
+        <xs:annotation><xs:documentation>Метод третьего угла</xs:documentation></xs:annotation>
+      </xs:enumeration>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <!-- ========================================================================
+       РАЗДЕЛ 2: РЕКВИЗИТЫ ДОКУМЕНТА (DOC_REQUISITE)
+       ======================================================================== -->
+
+  <xs:complexType name="doc_requisiteType">
+    <xs:annotation>
+      <xs:documentation>
+        Реквизитная часть конструкторского документа.
+        Наследует от eskd-core:BaseDocumentType.
+        ГОСТ Р 2.058-2023, табл. 1.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="eskd-core:BaseDocumentType">
+        <xs:sequence>
+          <xs:element name="designator" type="eskd-core:Designator" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>
+                Обозначение документа (обязательно, ГОСТ 2.201).
+              </xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="legal_owner" type="xs:IDREF" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>
+                Ссылка на организацию - владельца подлинника (обязательно).
+              </xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="creation_date" type="eskd-core:DateType" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>
+                Дата разработки документа (обязательно).
+              </xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="litera" type="eskd-2058:LiteraEnum" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>
+                Литера стадии разработки.
+              </xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="applicability" type="eskd-2058:ApplicabilityTypeEnum" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>
+                Тип применяемости документа.
+              </xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="restriction" type="eskd-core:LongText" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>
+                Ограничения на использование и распространение.
+              </xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="doc_form" type="eskd-2058:DocFormEnum" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>
+                Форма представления исходного КД (ГОСТ Р 2.058-2023, п. 12.3).
+              </xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="doc_format" type="eskd-core:CodeString" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>
+                Формат данных содержательной части исходного КД (п. 12.4).
+              </xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="doc_creating_system" type="eskd-core:ShortText" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>
+                Автоматизированная система (включая версию), в которой разработан ДЭ (п. 12.5).
+              </xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="doc_location" type="eskd-core:MediumText" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>
+                Место размещения исходного КД (АСУДИ, сервер и т. п.) (п. 12.6).
+              </xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="first_doc" type="xs:IDREF" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>
+                Первичное применение (ссылка на документ) (п. 13).
+              </xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:element name="doc_requisite" type="eskd-2058:doc_requisiteType">
+    <xs:annotation>
+      <xs:documentation>Экземпляр реквизитной части документа</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+
+  <!-- ========================================================================
+       РАЗДЕЛ 3: ВЕРСИИ И ИЗМЕНЕНИЯ (VERSION)
+       ======================================================================== -->
+
+  <xs:complexType name="versionType">
+    <xs:annotation>
+      <xs:documentation>
+        Версия документа (изменение).
+        Наследует от eskd-core:BaseEntityType.
+        ГОСТ Р 2.058-2023, табл. 2.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="eskd-core:BaseEntityType">
+        <xs:sequence>
+          <xs:element name="version_id" type="eskd-core:VersionString" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>
+                Номер изменения или версия (обязательно).
+              </xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="doc_requisite" type="xs:IDREF" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>
+                Ссылка на реквизиты документа (обязательно).
+              </xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="directive_ref" type="xs:IDREF" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>
+                Ссылка на распорядительный документ об изменении.
+              </xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="change_date" type="eskd-core:DateType" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>
+                Дата внесения изменения (обязательно).
+              </xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="change_reason" type="eskd-core:LongText" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>
+                Причина внесения изменения.
+              </xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="change_author" type="xs:IDREF" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>
+                Ссылка на лицо, внесшее изменение.
+              </xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:element name="version" type="eskd-2058:versionType">
+    <xs:annotation>
+      <xs:documentation>Экземпляр версии документа</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+
+  <!-- ========================================================================
+       РАЗДЕЛ 4: ДЕЙСТВИЯ С КД (DOC_HANDLING)
+       ======================================================================== -->
+
+  <xs:complexType name="doc_handlingType">
+    <xs:annotation>
+      <xs:documentation>
+        Действие с конструкторским документом.
+        Наследует от eskd-core:BaseEntityType.
+        ГОСТ Р 2.058-2023, табл. 3.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="eskd-core:BaseEntityType">
+        <xs:sequence>
+          <xs:element name="id" type="eskd-core:CodeString" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Идентификатор действия (обязательно)</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="handling_type" type="eskd-2058:DocHandlingTypeEnum" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Тип действия с документом (обязательно)</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="handling_date" type="eskd-core:DateTimeType" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Дата и время выполнения действия (обязательно)</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="handling_person" type="xs:IDREF" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Ссылка на лицо, выполнившее действие (обязательно)</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="handling_organization" type="xs:IDREF" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Ссылка на организацию, выполнившую действие</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="doc_requisite" type="xs:IDREF" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Ссылка на реквизиты документа (обязательно)</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="version" type="xs:IDREF" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Ссылка на версию документа</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="handling_result" type="eskd-core:MediumText" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Результат выполнения действия</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:element name="doc_handling" type="eskd-2058:doc_handlingType">
+    <xs:annotation>
+      <xs:documentation>Экземпляр действия с документом</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+
+  <!-- ========================================================================
+       РАЗДЕЛ 5: ПОДПИСИ (PERSON_SIGNATURE)
+       ======================================================================== -->
+
+  <xs:complexType name="person_signatureType">
+    <xs:annotation>
+      <xs:documentation>
+        Подпись лица в документе.
+        Наследует от eskd-core:BaseEntityType.
+        ГОСТ Р 2.058-2023, табл. 5.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="eskd-core:BaseEntityType">
+        <xs:sequence>
+          <xs:element name="id" type="eskd-core:CodeString" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Идентификатор подписи (обязательно)</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="person" type="xs:IDREF" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Ссылка на подписавшее лицо (обязательно)</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="signature_type" type="eskd-2058:SignatureTypeEnum" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Тип подписи (обязательно)</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="signature_date" type="eskd-core:DateTimeType" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Дата и время подписания (обязательно)</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="doc_requisite" type="xs:IDREF" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Ссылка на реквизиты документа (обязательно)</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="version" type="xs:IDREF" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Ссылка на версию документа</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="role" type="eskd-core:ShortText" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>
+                Роль подписавшего (Разработал, Проверил, Нормоконтроль и т.д.)
+              </xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="certificate_info" type="eskd-core:LongText" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Сведения о сертификате электронной подписи</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="certificate_validity" type="eskd-core:DateType" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Срок действия сертификата</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:element name="person_signature" type="eskd-2058:person_signatureType">
+    <xs:annotation>
+      <xs:documentation>Экземпляр подписи лица</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+
+  <!-- ========================================================================
+       РАЗДЕЛ 6: СОСТОЯНИЯ КД (STATUS)
+       ======================================================================== -->
+
+  <xs:complexType name="statusType">
+    <xs:annotation>
+      <xs:documentation>
+        Состояние конструкторского документа.
+        Наследует от eskd-core:BaseEntityType.
+        ГОСТ Р 2.058-2023, табл. 4.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="eskd-core:BaseEntityType">
+        <xs:sequence>
+          <xs:element name="id" type="eskd-core:CodeString" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Идентификатор состояния (обязательно)</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="status_type" type="eskd-2058:StatusTypeEnum" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Тип состояния (обязательно)</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="status_date" type="eskd-core:DateTimeType" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Дата и время установления состояния (обязательно)</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="doc_requisite" type="xs:IDREF" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Ссылка на реквизиты документа (обязательно)</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="version" type="xs:IDREF" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Ссылка на версию документа</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="basis" type="eskd-core:LongText" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Основание для установления состояния</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="previous_status" type="xs:IDREF" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Ссылка на предыдущее состояние (для истории)</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:element name="status" type="eskd-2058:statusType">
+    <xs:annotation>
+      <xs:documentation>Экземпляр состояния документа</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+
+  <!-- ========================================================================
+       РАЗДЕЛ 7: ПРИМЕНЯЕМОСТЬ (APPLICABILITY)
+       ======================================================================== -->
+
+  <xs:complexType name="applicabilityType">
+    <xs:annotation>
+      <xs:documentation>
+        Применяемость документа.
+        Наследует от eskd-core:BaseEntityType.
+        ГОСТ Р 2.058-2023, табл. 6.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="eskd-core:BaseEntityType">
+        <xs:sequence>
+          <xs:element name="id" type="eskd-core:CodeString" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Идентификатор применяемости (обязательно)</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="applicability_type" type="eskd-2058:ApplicabilityTypeEnum" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Тип применяемости (обязательно)</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="doc_requisite" type="xs:IDREF" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Ссылка на реквизиты документа (обязательно)</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="product" type="xs:IDREF" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>
+                Ссылка на изделие, для которого применяется документ.
+                Может ссылаться на eskd_product из 2.525 модуля.
+              </xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="effectivity" type="eskd-core:LongText" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>
+                Условия применяемости (серийные номера, даты выпуска).
+              </xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="litera" type="eskd-2058:LiteraEnum" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Литера стадии для данной применяемости</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:element name="applicability" type="eskd-2058:applicabilityType">
+    <xs:annotation>
+      <xs:documentation>Экземпляр применяемости документа</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+
+  <!-- ========================================================================
+       РАЗДЕЛ 8: РАСПОРЯДИТЕЛЬНЫЕ ДОКУМЕНТЫ (DIRECTIVE)
+       ======================================================================== -->
+
+  <xs:complexType name="directiveType">
+    <xs:annotation>
+      <xs:documentation>
+        Распорядительный документ об изменении.
+        Наследует от eskd-core:BaseDocumentType.
+        ГОСТ Р 2.058-2023, табл. 7.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="eskd-core:BaseDocumentType">
+        <xs:sequence>
+          <xs:element name="id" type="eskd-core:CodeString" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Идентификатор распорядительного документа (обязательно)</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="directive_type" type="eskd-2058:DirectiveTypeEnum" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Тип распорядительного документа (обязательно)</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="directive_number" type="eskd-core:CodeString" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Номер распорядительного документа (обязательно)</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="directive_date" type="eskd-core:DateType" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Дата распорядительного документа (обязательно)</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="issuing_organization" type="xs:IDREF" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Ссылка на организацию, издавшую документ (обязательно)</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="affected_docs" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Список受影响 документов</xs:documentation>
+            </xs:annotation>
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="doc_ref" type="xs:IDREF" minOccurs="0" maxOccurs="unbounded">
+                  <xs:annotation>
+                    <xs:documentation>Ссылка на документ, затрагиваемый изменением</xs:documentation>
+                  </xs:annotation>
+                </xs:element>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+          
+          <xs:element name="directive_text" type="eskd-core:LongText" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Текст распорядительного документа</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:element name="directive" type="eskd-2058:directiveType">
+    <xs:annotation>
+      <xs:documentation>Экземпляр распорядительного документа</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+
+  <!-- ========================================================================
+       РАЗДЕЛ 9: ОРГАНИЗАЦИИ И ЛИЦА (ORGANIZATION, PERSON)
+       ======================================================================== -->
+
+  <xs:complexType name="organizationType">
+    <xs:annotation>
+      <xs:documentation>
+        Организация в контексте 2.058.
+        Наследует от eskd-core:BaseOrganizationType.
+        Расширяет organization из 2.525.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="eskd-core:BaseOrganizationType">
+        <xs:sequence>
+          <xs:element name="id" type="eskd-core:CodeString" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Код организации (ИНН, внутренний код)</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="inn" type="eskd-core:CodeString" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>ИНН организации</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="kpp" type="eskd-core:CodeString" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>КПП организации</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="ogrn" type="eskd-core:CodeString" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>ОГРН организации</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="address" type="eskd-core:LongText" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Юридический адрес</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="contact_info" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Контактная информация</xs:documentation>
+            </xs:annotation>
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="phone" type="eskd-core:ShortText" minOccurs="0" maxOccurs="1"/>
+                <xs:element name="fax" type="eskd-core:ShortText" minOccurs="0" maxOccurs="1"/>
+                <xs:element name="email" type="xs:string" minOccurs="0" maxOccurs="1"/>
+                <xs:element name="website" type="xs:anyURI" minOccurs="0" maxOccurs="1"/>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:element name="organization" type="eskd-2058:organizationType">
+    <xs:annotation>
+      <xs:documentation>Экземпляр организации (2.058)</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+
+  <xs:complexType name="personType">
+    <xs:annotation>
+      <xs:documentation>
+        Физическое лицо в контексте 2.058.
+        Наследует от eskd-core:BasePersonType.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="eskd-core:BasePersonType">
+        <xs:sequence>
+          <xs:element name="id" type="eskd-core:CodeString" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Идентификатор лица (табельный номер, ID)</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="position" type="eskd-core:ShortText" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Должность лица</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="organization" type="xs:IDREF" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Ссылка на организацию, где работает лицо</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="email" type="xs:string" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Электронная почта</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="phone" type="eskd-core:ShortText" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Телефон</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="certificate_info" type="eskd-core:LongText" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Сведения о сертификате электронной подписи</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="certificate_validity" type="eskd-core:DateType" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Срок действия сертификата</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:element name="person" type="eskd-2058:personType">
+    <xs:annotation>
+      <xs:documentation>Экземпляр физического лица (2.058)</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+
+  <xs:complexType name="person_organization_assignmentType">
+    <xs:annotation>
+      <xs:documentation>
+        Назначение лица в организации.
+        Наследует от eskd-core:BaseEntityType.
+        ГОСТ Р 2.058-2023.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="eskd-core:BaseEntityType">
+        <xs:sequence>
+          <xs:element name="id" type="eskd-core:CodeString" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Идентификатор назначения (обязательно)</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="person" type="xs:IDREF" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Ссылка на лицо (обязательно)</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="organization" type="xs:IDREF" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Ссылка на организацию (обязательно)</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="role" type="eskd-core:AssignmentRoleEnum" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Роль лица в организации (обязательно)</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="start_date" type="eskd-core:DateType" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Дата начала назначения</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="end_date" type="eskd-core:DateType" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Дата окончания назначения</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="is_primary" type="xs:boolean" minOccurs="0" maxOccurs="1" default="true">
+            <xs:annotation>
+              <xs:documentation>Признак основного места работы</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:element name="person_organization_assignment" type="eskd-2058:person_organization_assignmentType">
+    <xs:annotation>
+      <xs:documentation>Экземпляр назначения лица в организации</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+
+  <!-- ========================================================================
+       РАЗДЕЛ 10: СОДЕРЖАТЕЛЬНАЯ ЧАСТЬ ДОКУМЕНТА (DOC_CONTENT)
+       ======================================================================== -->
+
+  <xs:complexType name="doc_contentType">
+    <xs:annotation>
+      <xs:documentation>
+        Основные сведения о содержательной части КД.
+        Наследует от eskd-core:BaseEntityType.
+        ГОСТ Р 2.058-2023, п. 16.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="eskd-core:BaseEntityType">
+        <xs:sequence>
+          <xs:element name="doc_requisite" type="xs:IDREF" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Ссылка на реквизиты документа (обязательно)</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="files" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Файлы содержательной части</xs:documentation>
+            </xs:annotation>
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="file" minOccurs="0" maxOccurs="unbounded">
+                  <xs:complexType>
+                    <xs:sequence>
+                      <xs:element name="file_name" type="eskd-core:ShortText" minOccurs="1" maxOccurs="1">
+                        <xs:annotation>
+                          <xs:documentation>Имя файла содержательной части (п. 16.1)</xs:documentation>
+                        </xs:annotation>
+                      </xs:element>
+                      
+                      <xs:element name="file_size" type="eskd-core:NonNegativeInteger" minOccurs="0" maxOccurs="1">
+                        <xs:annotation>
+                          <xs:documentation>Размер файла содержательной части (п. 16.2)</xs:documentation>
+                        </xs:annotation>
+                      </xs:element>
+                      
+                      <xs:element name="file_format" type="eskd-core:CodeString" minOccurs="0" maxOccurs="1">
+                        <xs:annotation>
+                          <xs:documentation>Формат данных файла содержательной части (п. 16.3)</xs:documentation>
+                        </xs:annotation>
+                      </xs:element>
+                      
+                      <xs:element name="scale" type="eskd-core:ShortText" minOccurs="0" maxOccurs="1">
+                        <xs:annotation>
+                          <xs:documentation>Масштаб (п. 16.4)</xs:documentation>
+                        </xs:annotation>
+                      </xs:element>
+                      
+                      <xs:element name="unit_of_measure" type="eskd-core:CodeString" minOccurs="0" maxOccurs="1">
+                        <xs:annotation>
+                          <xs:documentation>Единица измерения (п. 16.5)</xs:documentation>
+                        </xs:annotation>
+                      </xs:element>
+                      
+                      <xs:element name="projection_method" type="eskd-2058:ProjectionMethodEnum" minOccurs="0" maxOccurs="1">
+                        <xs:annotation>
+                          <xs:documentation>Метод проецирования (п. 16.6)</xs:documentation>
+                        </xs:annotation>
+                      </xs:element>
+                      
+                      <xs:element name="file_hash" type="eskd-core:CodeString" minOccurs="0" maxOccurs="1">
+                        <xs:annotation>
+                          <xs:documentation>Хеш-сумма файла для контроля целостности</xs:documentation>
+                        </xs:annotation>
+                      </xs:element>
+                      
+                      <xs:element name="file_location" type="eskd-core:MediumText" minOccurs="0" maxOccurs="1">
+                        <xs:annotation>
+                          <xs:documentation>Место размещения файла (п. 12.6)</xs:documentation>
+                        </xs:annotation>
+                      </xs:element>
+                    </xs:sequence>
+                  </xs:complexType>
+                </xs:element>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:element name="doc_content" type="eskd-2058:doc_contentType">
+    <xs:annotation>
+      <xs:documentation>Экземпляр содержательной части документа</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+
+  <!-- ========================================================================
+       РАЗДЕЛ 11: КОРНЕВОЙ ЭЛЕМЕНТ МОДУЛЯ
+       ======================================================================== -->
+
+  <xs:element name="ESKDRequisites2058">
+    <xs:annotation>
+      <xs:documentation>
+        Корневой элемент для реквизитной части КД по ГОСТ Р 2.058-2023.
+        Содержит все реквизиты документов, версии, подписи, состояния.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="metadata" minOccurs="1" maxOccurs="1">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="schemaVersion" type="eskd-core:VersionString" minOccurs="1" maxOccurs="1"/>
+              <xs:element name="creationDate" type="eskd-core:DateTimeType" minOccurs="1" maxOccurs="1"/>
+              <xs:element name="sourceSystem" type="eskd-core:ShortText" minOccurs="0" maxOccurs="1"/>
+              <xs:element name="exportedBy" type="eskd-core:ShortText" minOccurs="0" maxOccurs="1"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+
+        <xs:element name="docRequisites" minOccurs="0">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element ref="eskd-2058:doc_requisite" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+
+        <xs:element name="versions" minOccurs="0">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element ref="eskd-2058:version" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+
+        <xs:element name="docHandlings" minOccurs="0">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element ref="eskd-2058:doc_handling" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+
+        <xs:element name="signatures" minOccurs="0">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element ref="eskd-2058:person_signature" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+
+        <xs:element name="statuses" minOccurs="0">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element ref="eskd-2058:status" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+
+        <xs:element name="applicabilities" minOccurs="0">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element ref="eskd-2058:applicability" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+
+        <xs:element name="directives" minOccurs="0">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element ref="eskd-2058:directive" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+
+        <xs:element name="organizations" minOccurs="0">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element ref="eskd-2058:organization" minOccurs="0" maxOccurs="unbounded"/>
+              <xs:element ref="eskd-2058:person_organization_assignment" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+
+        <xs:element name="persons" minOccurs="0">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element ref="eskd-2058:person" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+
+        <xs:element name="docContents" minOccurs="0">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element ref="eskd-2058:doc_content" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+
+    <!-- ========================================================================
+         КЛЮЧИ ДЛЯ ВАЛИДАЦИИ ССЫЛОК (XSD 1.1 key/keyref)
+         ======================================================================== -->
+
+    <xs:key name="DocRequisiteKey">
+      <xs:selector xpath="eskd-2058:docRequisites/eskd-2058:doc_requisite"/>
+      <xs:field xpath="@id"/>
+    </xs:key>
+
+    <xs:key name="VersionKey">
+      <xs:selector xpath="eskd-2058:versions/eskd-2058:version"/>
+      <xs:field xpath="@id"/>
+    </xs:key>
+
+    <xs:key name="OrganizationKey">
+      <xs:selector xpath="eskd-2058:organizations/eskd-2058:organization"/>
+      <xs:field xpath="@id"/>
+    </xs:key>
+
+    <xs:key name="PersonKey">
+      <xs:selector xpath="eskd-2058:persons/eskd-2058:person"/>
+      <xs:field xpath="@id"/>
+    </xs:key>
+
+    <xs:key name="DirectiveKey">
+      <xs:selector xpath="eskd-2058:directives/eskd-2058:directive"/>
+      <xs:field xpath="@id"/>
+    </xs:key>
+
+    <xs:key name="StatusKey">
+      <xs:selector xpath="eskd-2058:statuses/eskd-2058:status"/>
+      <xs:field xpath="@id"/>
+    </xs:key>
+
+    <!-- Ключи для ссылок (keyref) -->
+    <xs:keyref name="Version_DocRequisiteRef" refer="eskd-2058:DocRequisiteKey">
+      <xs:selector xpath="eskd-2058:versions/eskd-2058:version"/>
+      <xs:field xpath="eskd-2058:doc_requisite"/>
+    </xs:keyref>
+
+    <xs:keyref name="DocHandling_PersonRef" refer="eskd-2058:PersonKey">
+      <xs:selector xpath="eskd-2058:docHandlings/eskd-2058:doc_handling"/>
+      <xs:field xpath="eskd-2058:handling_person"/>
+    </xs:keyref>
+
+    <xs:keyref name="DocHandling_DocRequisiteRef" refer="eskd-2058:DocRequisiteKey">
+      <xs:selector xpath="eskd-2058:docHandlings/eskd-2058:doc_handling"/>
+      <xs:field xpath="eskd-2058:doc_requisite"/>
+    </xs:keyref>
+
+    <xs:keyref name="DocHandling_OrganizationRef" refer="eskd-2058:OrganizationKey">
+      <xs:selector xpath="eskd-2058:docHandlings/eskd-2058:doc_handling"/>
+      <xs:field xpath="eskd-2058:handling_organization"/>
+    </xs:keyref>
+
+    <xs:keyref name="PersonSignature_PersonRef" refer="eskd-2058:PersonKey">
+      <xs:selector xpath="eskd-2058:signatures/eskd-2058:person_signature"/>
+      <xs:field xpath="eskd-2058:person"/>
+    </xs:keyref>
+
+    <xs:keyref name="PersonSignature_DocRequisiteRef" refer="eskd-2058:DocRequisiteKey">
+      <xs:selector xpath="eskd-2058:signatures/eskd-2058:person_signature"/>
+      <xs:field xpath="eskd-2058:doc_requisite"/>
+    </xs:keyref>
+
+    <xs:keyref name="Status_DocRequisiteRef" refer="eskd-2058:DocRequisiteKey">
+      <xs:selector xpath="eskd-2058:statuses/eskd-2058:status"/>
+      <xs:field xpath="eskd-2058:doc_requisite"/>
+    </xs:keyref>
+
+    <xs:keyref name="Applicability_DocRequisiteRef" refer="eskd-2058:DocRequisiteKey">
+      <xs:selector xpath="eskd-2058:applicabilities/eskd-2058:applicability"/>
+      <xs:field xpath="eskd-2058:doc_requisite"/>
+    </xs:keyref>
+
+    <xs:keyref name="Directive_OrganizationRef" refer="eskd-2058:OrganizationKey">
+      <xs:selector xpath="eskd-2058:directives/eskd-2058:directive"/>
+      <xs:field xpath="eskd-2058:issuing_organization"/>
+    </xs:keyref>
+
+    <xs:keyref name="DocRequisite_LegalOwnerRef" refer="eskd-2058:OrganizationKey">
+      <xs:selector xpath="eskd-2058:docRequisites/eskd-2058:doc_requisite"/>
+      <xs:field xpath="eskd-2058:legal_owner"/>
+    </xs:keyref>
+
+    <xs:keyref name="Person_OrganizationRef" refer="eskd-2058:OrganizationKey">
+      <xs:selector xpath="eskd-2058:persons/eskd-2058:person"/>
+      <xs:field xpath="eskd-2058:organization"/>
+    </xs:keyref>
+
+    <xs:keyref name="PersonOrgAssignment_PersonRef" refer="eskd-2058:PersonKey">
+      <xs:selector xpath="eskd-2058:organizations/eskd-2058:person_organization_assignment"/>
+      <xs:field xpath="eskd-2058:person"/>
+    </xs:keyref>
+
+    <xs:keyref name="PersonOrgAssignment_OrganizationRef" refer="eskd-2058:OrganizationKey">
+      <xs:selector xpath="eskd-2058:organizations/eskd-2058:person_organization_assignment"/>
+      <xs:field xpath="eskd-2058:organization"/>
+    </xs:keyref>
+  </xs:element>
+
+  <!-- ========================================================================
+       ПРАВИЛА ВАЛИДАЦИИ (XSD 1.1 assert)
+       ======================================================================== -->
+
+  <xs:assert test="every $v in eskd-2058:versions/eskd-2058:version satisfies 
+                   (exists(eskd-2058:docRequisites/eskd-2058:doc_requisite[@id = $v/eskd-2058:doc_requisite]))">
+    <xs:annotation>
+      <xs:documentation>
+        Каждая версия должна ссылаться на существующие реквизиты документа.
+      </xs:documentation>
+    </xs:annotation>
+  </xs:assert>
+
+  <xs:assert test="every $s in eskd-2058:statuses/eskd-2058:status satisfies 
+                   (exists(eskd-2058:docRequisites/eskd-2058:doc_requisite[@id = $s/eskd-2058:doc_requisite]))">
+    <xs:annotation>
+      <xs:documentation>
+        Каждое состояние должно ссылаться на существующие реквизиты документа.
+      </xs:documentation>
+    </xs:annotation>
+  </xs:assert>
+
+  <xs:assert test="every $sig in eskd-2058:signatures/eskd-2058:person_signature satisfies 
+                   (exists(eskd-2058:persons/eskd-2058:person[@id = $sig/eskd-2058:person]) and 
+                    exists(eskd-2058:docRequisites/eskd-2058:doc_requisite[@id = $sig/eskd-2058:doc_requisite]))">
+    <xs:annotation>
+      <xs:documentation>
+        Каждая подпись должна ссылаться на существующее лицо и реквизиты документа.
+      </xs:documentation>
+    </xs:annotation>
+  </xs:assert>
+
+  <xs:assert test="every $dh in eskd-2058:docHandlings/eskd-2058:doc_handling satisfies 
+                   ($dh/eskd-2058:handling_type != 'DEVELOPMENT' or 
+                    exists($dh/eskd-2058:handling_person))">
+    <xs:annotation>
+      <xs:documentation>
+        Действие 'DEVELOPMENT' должно иметь исполнителя.
+      </xs:documentation>
+    </xs:annotation>
+  </xs:assert>
+
+</xs:schema>

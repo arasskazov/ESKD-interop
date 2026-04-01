@@ -1,0 +1,625 @@
+@startuml
+' ============================================================================
+' ER-ДИАГРАММА ПРОФИЛЯ ИНТЕРОПЕРАБЕЛЬНОСТИ ЭКБ/РЭА
+' Основано на: ГОСТ Р 2.525-2024, ГОСТ Р 2.058-2023, ГОСТ Р 77.403
+' ============================================================================
+
+skinparam entity {
+  BackgroundColor White
+  BorderColor Black
+  ArrowColor Navy
+  AttributeFontColor Black
+  AttributeFontSize 11
+}
+
+skinparam relationship {
+  Color Navy
+  ArrowColor Navy
+  LineThickness 1
+}
+
+title Профиль интероперабельности ЭКБ/РЭА (ГОСТ Р 77.403)
+legend top left
+  | Уровень | Модуль |
+  | Core | Базовые типы |
+  | 2.525 | Структура изделия |
+  | 2.058 | Реквизиты документов |
+  | Binding | Связывание модулей |
+  | EKB | Профиль ЭКБ/РЭА |
+endlegend
+
+' ============================================================================
+' РАЗДЕЛ 1: ЯДРО ПРОФИЛЯ (INTERFACE)
+' ============================================================================
+
+entity "ProfileRoot" as PR {
+  *profileNamespace : anyURI <<required>>
+  generatedDate : DateTime
+  --
+  <<abstract>>
+}
+
+entity "ProfileMetadata" as PM {
+  *profileId : CodeString
+  *profileVersion : VersionString
+  *profileName : ShortText
+  description : LongText
+  *interoperabilityDegree : Percentage
+  --
+  <<required>>
+}
+
+PR ||--|| PM : "содержит"
+
+' ============================================================================
+' РАЗДЕЛ 2: ИЗДЕЛИЯ (ГОСТ Р 2.525-2024)
+' ============================================================================
+
+entity "eskd_product" as EP {
+  *id : Designator
+  *name : ShortText
+  *product_type : ProductTypeEnum
+  frame_of_reference : IDREFS
+  --
+  <<2.525>>
+}
+
+entity "product_definition_formation" as PDF {
+  *id : VersionString
+  *of_product : IDREF
+  *make_or_buy : MakeOrBuyEnum
+  *standard : boolean
+  --
+  <<2.525>>
+}
+
+entity "product_definition" as PD {
+  *id : CodeString
+  *formation : IDREF
+  *frame_of_reference : IDREF
+  --
+  <<2.525>>
+}
+
+entity "product_context" as PC {
+  *id : CodeString
+  *application : ContextApplicationEnum
+  discipline_type : CodeString
+  *name : ShortText
+  --
+  <<2.525>>
+}
+
+entity "product_definition_context" as PDC {
+  *id : CodeString
+  *application : ShortText
+  life_cycle_stage : LifecycleStageEnum
+  *name : ShortText
+  --
+  <<2.525>>
+}
+
+EP ||--o{ PDF : "имеет версии"
+PDF ||--o{ PD : "описывается"
+PD }o--|| PDC : "в контексте"
+EP }o--o{ PC : "классифицируется"
+
+' ============================================================================
+' РАЗДЕЛ 3: СТРУКТУРА ИЗДЕЛИЯ (ГОСТ Р 2.525-2024)
+' ============================================================================
+
+entity "assembly_component_usage" as ACU {
+  *id : CodeString
+  *name : ShortText
+  *relating_product_definition : IDREF
+  *related_product_definition : IDREF
+  reference_designator : CodeString
+  --
+  <<2.525>>
+}
+
+entity "next_assembly_usage_occurrence" as NAUO {
+  --
+  <<extends ACU>>
+  <<2.525>>
+}
+
+entity "quantified_assembly_component_usage" as QACU {
+  *quantity : IDREF
+  --
+  <<extends ACU>>
+  <<2.525>>
+}
+
+entity "assembly_component_usage_substitute" as ACUS {
+  *id : CodeString
+  *base : IDREF
+  *substitute : IDREF
+  *ranking : PositiveInteger
+  *ranking_rationale : MediumText
+  --
+  <<2.525>>
+}
+
+entity "make_from_usage_option" as MFUO {
+  *id : CodeString
+  *name : ShortText
+  *relating_product_definition : IDREF
+  *related_product_definition : IDREF
+  *ranking : PositiveInteger
+  quantity : IDREF
+  --
+  <<2.525>>
+}
+
+PD ||--o{ ACU : "содержит"
+ACU <|-- NAUO : "наследование"
+ACU <|-- QACU : "наследование"
+ACU ||--o{ ACUS : "имеет замены"
+PD ||--o{ MFUO : "изготавливается из"
+
+' ============================================================================
+' РАЗДЕЛ 4: ДОКУМЕНТЫ (ГОСТ Р 2.525-2024)
+' ============================================================================
+
+entity "document" as DOC {
+  *id : Designator
+  *title : ShortText
+  *kind : DocumentKindEnum
+  --
+  <<2.525>>
+}
+
+entity "eskd_document_version" as EDV {
+  *id : CodeString
+  *version : VersionString
+  items : IDREFS
+  --
+  <<2.525>>
+}
+
+entity "eskd_document_item" as EDI {
+  *id : CodeString
+  name : ShortText
+  *representation : RepresentationTypeEnum
+  data_type : CodeString
+  location : MediumText
+  --
+  <<2.525>>
+}
+
+entity "document_product_association" as DPA {
+  *id : CodeString
+  *related_product : IDREF
+  relating_document : IDREF
+  --
+  <<2.525>>
+}
+
+DOC ||--o{ EDV : "имеет версии"
+EDV ||--o{ EDI : "содержит позиции"
+DOC }o--o{ EP : "связано с изделием"
+
+' ============================================================================
+' РАЗДЕЛ 5: ОРГАНИЗАЦИИ И ЛИЦА (2.525 + 2.058)
+' ============================================================================
+
+entity "organization_2525" as ORG2525 {
+  *id : CodeString
+  *name : ShortText
+  shortName : ShortText
+  --
+  <<2.525>>
+}
+
+entity "organization_2058" as ORG2058 {
+  *id : CodeString
+  *name : ShortText
+  shortName : ShortText
+  inn : CodeString
+  kpp : CodeString
+  ogrn : CodeString
+  address : LongText
+  --
+  <<2.058>>
+}
+
+entity "organization_role" as OR {
+  *id : CodeString
+  *name : OrganizationRoleEnum
+  --
+  <<2.525>>
+}
+
+entity "eskd_organization_product_assignment" as EOPA {
+  *id : CodeString
+  *assigned_product : IDREF
+  *assigned_organization : IDREF
+  *role : IDREF
+  --
+  <<2.525>>
+}
+
+entity "person" as PER {
+  *id : CodeString
+  *lastName : ShortText
+  *firstName : ShortText
+  patronymic : ShortText
+  position : ShortText
+  organization : IDREF
+  email : string
+  phone : ShortText
+  --
+  <<2.058>>
+}
+
+entity "person_organization_assignment" as POA {
+  *id : CodeString
+  *person : IDREF
+  *organization : IDREF
+  *role : AssignmentRoleEnum
+  start_date : Date
+  end_date : Date
+  is_primary : boolean
+  --
+  <<2.058>>
+}
+
+ORG2525 ||--o{ EOPA : "назначено на изделия"
+ORG2058 ||--o{ POA : "нанимает лиц"
+PER ||--o{ POA : "работает в"
+EP ||--o{ EOPA : "принадлежит"
+
+' ============================================================================
+' РАЗДЕЛ 6: РЕКВИЗИТЫ ДОКУМЕНТОВ (ГОСТ Р 2.058-2023)
+' ============================================================================
+
+entity "doc_requisite" as DR {
+  *id : CodeString
+  *designator : Designator
+  *title : ShortText
+  *legal_owner : IDREF
+  *creation_date : Date
+  litera : LiteraEnum
+  applicability : ApplicabilityTypeEnum
+  restriction : LongText
+  doc_form : DocFormEnum
+  --
+  <<2.058>>
+}
+
+entity "version_2058" as V2058 {
+  *id : CodeString
+  *version_id : VersionString
+  *doc_requisite : IDREF
+  directive_ref : IDREF
+  *change_date : Date
+  change_reason : LongText
+  change_author : IDREF
+  --
+  <<2.058>>
+}
+
+entity "doc_handling" as DH {
+  *id : CodeString
+  *handling_type : DocHandlingTypeEnum
+  *handling_date : DateTime
+  *handling_person : IDREF
+  handling_organization : IDREF
+  *doc_requisite : IDREF
+  version : IDREF
+  handling_result : MediumText
+  --
+  <<2.058>>
+}
+
+entity "person_signature" as PS {
+  *id : CodeString
+  *person : IDREF
+  *signature_type : SignatureTypeEnum
+  *signature_date : DateTime
+  *doc_requisite : IDREF
+  version : IDREF
+  *role : ShortText
+  certificate_info : LongText
+  --
+  <<2.058>>
+}
+
+entity "status" as ST {
+  *id : CodeString
+  *status_type : StatusTypeEnum
+  *status_date : DateTime
+  *doc_requisite : IDREF
+  version : IDREF
+  basis : LongText
+  previous_status : IDREF
+  --
+  <<2.058>>
+}
+
+entity "applicability" as APP {
+  *id : CodeString
+  *applicability_type : ApplicabilityTypeEnum
+  *doc_requisite : IDREF
+  product : IDREF
+  effectivity : LongText
+  litera : LiteraEnum
+  --
+  <<2.058>>
+}
+
+entity "directive" as DIR {
+  *id : CodeString
+  *directive_type : DirectiveTypeEnum
+  *directive_number : CodeString
+  *directive_date : Date
+  *issuing_organization : IDREF
+  directive_text : LongText
+  --
+  <<2.058>>
+}
+
+entity "doc_content" as DC {
+  *id : CodeString
+  *doc_requisite : IDREF
+  --
+  <<2.058>>
+}
+
+DR ||--o{ V2058 : "имеет версии"
+DR ||--o{ DH : "обрабатывается"
+DR ||--o{ PS : "подписано"
+DR ||--o{ ST : "имеет статус"
+DR ||--o{ APP : "применяется к"
+DR ||--o{ DC : "содержит"
+DIR ||--o{ V2058 : "авторизует"
+
+' ============================================================================
+' РАЗДЕЛ 7: СВЯЗЫВАНИЕ МОДУЛЕЙ (BINDING)
+' ============================================================================
+
+entity "productToDocRequisiteMapping" as PTDRM {
+  *productRef : IDREF
+  docRequisiteRef : IDREF
+  --
+  <<Binding>>
+}
+
+entity "documentToDocRequisiteMapping" as DTDRM {
+  *documentRef : IDREF
+  *docRequisiteRef : IDREF
+  --
+  <<Binding>>
+}
+
+entity "versionMapping" as VM {
+  *productVersionRef : IDREF
+  docVersionRef : IDREF
+  --
+  <<Binding>>
+}
+
+entity "organizationMapping" as OM {
+  organization2525Ref : IDREF
+  organization2058Ref : IDREF
+  --
+  <<Binding>>
+}
+
+EP ||--o{ PTDRM : "сопоставлено"
+DOC ||--o{ DTDRM : "сопоставлено"
+PDF ||--o{ VM : "версия сопоставлена"
+ORG2525 ||--o{ OM : "унифицировано"
+DR ||--o{ PTDRM : "связано с изделием"
+DR ||--o{ DTDRM : "связано с документом"
+
+' ============================================================================
+' РАЗДЕЛ 8: ПРОФИЛЬ ЭКБ/РЭА (ГОСТ Р 77.403)
+' ============================================================================
+
+entity "allowed_component_list" as ACL {
+  *id : CodeString
+  *listId : Designator
+  *listName : ShortText
+  *approvalDocument : DocumentReference
+  *issuingAuthority : IDREF
+  *effectiveDate : Date
+  expirationDate : Date
+  scopeDescription : LongText
+  --
+  <<EKB Profile>>
+}
+
+entity "allowed_component_item" as ACI {
+  *id : CodeString
+  *itemId : CodeString
+  *componentRef : IDREF
+  *approvalStatus : ApprovalStatusEnum
+  *equivalenceCategory : EquivalenceCategoryEnum
+  manufacturer : IDREF
+  countryOfOrigin : CodeString
+  applicationConstraints : LongText
+  operatingConditions : LongText
+  associatedReplacementGroupRef : IDREF
+  qualificationStatus : QualificationLevelEnum
+  criticality : ComponentCriticalityEnum
+  testReportRef : IDREF
+  notes : LongText
+  --
+  <<EKB Profile>>
+}
+
+entity "replacement_group" as RG {
+  *id : CodeString
+  *groupId : CodeString
+  *baseComponentRef : IDREF
+  replacementReason : LongText
+  --
+  <<EKB Profile>>
+}
+
+entity "replacement_item" as RI {
+  *id : CodeString
+  *replacementProductRef : IDREF
+  *priority : PositiveInteger
+  *equivalenceLevel : EquivalenceLevelEnum
+  usageConditions : LongText
+  approvalDocumentRef : IDREF
+  impactAnalysis : LongText
+  --
+  <<EKB Profile>>
+}
+
+entity "compliance_assertion" as CA {
+  *id : CodeString
+  *assertionId : CodeString
+  *productRef : IDREF
+  *allowedListRef : IDREF
+  *complianceLevel : ComplianceLevelEnum
+  nonCompliantItems : LongText
+  verificationDate : Date
+  verifierRef : IDREF
+  verificationMethod : ShortText
+  validUntil : Date
+  --
+  <<EKB Profile>>
+}
+
+entity "DocumentReference" as DRT {
+  *documentRef : IDREF
+  documentVersionRef : IDREF
+  fragmentRef : CodeString
+  --
+  <<EKB Profile>>
+}
+
+PR ||--o{ ACL : "содержит"
+ACL ||--|{ ACI : "содержит позиции"
+ACI }o--|| EP : "ссылается на компонент"
+ACI }o--|| ORG2058 : "производитель"
+ACI }o--|| DOC : "отчёт об испытаниях"
+RG ||--|{ RI : "содержит замены"
+RI }o--|| EP : "заменяет продукт"
+CA }o--|| EP : "для изделия"
+CA }o--|| ACL : "по перечню"
+CA }o--|| ORG2058 : "проверено лицом"
+ACL }o--|| ORG2058 : "утверждён организацией"
+ACL }o--|| DOC : "утверждён документом"
+ACI }o--|| RG : "имеет группу замен"
+
+' ============================================================================
+' РАЗДЕЛ 9: ЕДИНИЦЫ ИЗМЕРЕНИЯ (2.525)
+' ============================================================================
+
+entity "measure_with_unit" as MWU {
+  *id : CodeString
+  *value : RealNumber
+  *unit : CodeString
+  uncertainty : RealNumber
+  measurementType : MeasurementTypeEnum
+  --
+  <<2.525>>
+}
+
+entity "context_dependent_unit" as CDU {
+  *id : CodeString
+  *name : ShortText
+  --
+  <<2.525>>
+}
+
+MWU }o--|| CDU : "использует единицу"
+QACU }o--|| MWU : "имеет количество"
+MFUO }o--|| MWU : "имеет количество"
+
+' ============================================================================
+' РАЗДЕЛ 10: ДОПОЛНИТЕЛЬНЫЕ СВЯЗИ
+' ============================================================================
+
+' Связи между документами и реквизитами
+DOC ||--|| DR : "связано через Binding"
+
+' Связи версий
+V2058 ||--|| EDV : "корреляция версий"
+
+' Связи организаций
+ORG2525 ||..|| ORG2058 : "унифицировано через OM"
+
+' Связи лиц и подписей
+PER ||--o{ PS : "подписывает документы"
+PER ||--o{ DH : "обрабатывает документы"
+
+' ============================================================================
+' БИЗНЕС-ПРАВИЛА (аннотации)
+' ============================================================================
+
+note bottom of ACL
+  **Правила валидации:**
+  - expirationDate >= effectiveDate
+  - Должен содержать ≥1 allowed_component_item
+  - issuingAuthority должен существовать в 2.058
+end note
+
+note right of ACI
+  **Правила валидации:**
+  - componentRef должен существовать в 2.525
+  - criticality='critical' → testReportRef обязателен (уровень C)
+  - approvalStatus='conditionally' → applicationConstraints обязателен
+end note
+
+note left of CA
+  **Правила валидации:**
+  - complianceLevel='partial' → nonCompliantItems обязателен
+  - validUntil >= verificationDate
+  - verificationDate не в будущем
+end note
+
+note bottom of RG
+  **Правила валидации:**
+  - Должна содержать ≥1 replacement_item
+  - baseComponentRef должен существовать
+end note
+
+note right of RI
+  **Правила валидации:**
+  - priority >= 1
+  - impactAnalysis рекомендуется
+end note
+
+note bottom of PTDRM
+  **Binding правила:**
+  - productRef должен существовать в 2.525
+  - docRequisiteRef должен существовать в 2.058
+end note
+
+' ============================================================================
+' УРОВНИ ИНТЕРОПЕРАБЕЛЬНОСТИ
+' ============================================================================
+
+rectangle "Уровни интероперабельности (ГОСТ Р 77.403)" as Levels {
+  note bottom
+    **Уровень A (Базовый):** 0.50
+    - XSD валидация
+    - Обязательные атрибуты
+    
+    **Уровень B (Расширенный):** 0.75
+    - ≥70% рекомендуемых атрибутов
+    - ≥80% Schematron правил
+    
+    **Уровень C (Полный):** 0.95
+    - ≥90% рекомендуемых атрибутов
+    - 100% Schematron правил
+    - 100% Binding валиден
+
+    <b>Формула расчёта степени</b>
+    I = (M × 0.5) + (R × 0.3) + (S × 0.2)
+    
+    Где:
+    M — обязательные атрибуты
+    R — рекомендуемые атрибуты
+    S — правила Schematron
+  end note
+}
+
+@enduml

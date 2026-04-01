@@ -1,0 +1,261 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ============================================================================
+  ПРИМЕР ВАЛИДНОГО XML: ПРОФИЛЬ ЭКБ/РЭА
+  ============================================================================
+  Профиль: ekb-rerea-1.0
+  Namespace: http://gost.ru/eskd/profile/ekb/2024
+  Основано на: ГОСТ Р 77.403, ГОСТ Р 2.525-2024, ГОСТ Р 2.058-2023
+  ============================================================================
+-->
+<eskd-ekb:EkbProfileRoot 
+    xmlns:eskd-ekb="http://gost.ru/eskd/profile/ekb/2024"
+    xmlns:eskd-core="http://gost.ru/eskd/core/2024"
+    xmlns:eskd-pi="http://gost.ru/eskd/profile/interface/2024"
+    xmlns:eskd-2525="http://gost.ru/eskd/2.525/2024"
+    xmlns:eskd-2058="http://gost.ru/eskd/2.058/2023"
+    profileNamespace="http://gost.ru/eskd/profile/ekb/2024"
+    generatedDate="2025-01-15T10:00:00"
+    sourceSystem="PLM-Enterprise v5.2">
+
+  <!-- =========================================================================
+       МЕТАДАННЫЕ ПРОФИЛЯ (обязательно по контракту ProfileMetadataType)
+       ========================================================================= -->
+  <eskd-pi:metadata>
+    <eskd-pi:profileId>ekb-rerea-1.0</eskd-pi:profileId>
+    <eskd-pi:profileVersion>1.0</eskd-pi:profileVersion>
+    <eskd-pi:profileName>Разрешённые перечни РЭА/ЭКБ</eskd-pi:profileName>
+    <eskd-pi:description>
+      Обмен данными о разрешённых перечнях электронной компонентной базы (ЭКБ) 
+      и радиоэлектронной аппаратуры (РЭА). Включает проверку соответствия 
+      изделий разрешённым перечням, управление допустимыми заменами компонентов.
+    </eskd-pi:description>
+    <eskd-pi:requiredModules>
+      <eskd-pi:moduleRef>eskd_core</eskd-pi:moduleRef>
+      <eskd-pi:moduleRef>eskd_2.525_module</eskd-pi:moduleRef>
+      <eskd-pi:moduleRef>eskd_2.058_module</eskd-pi:moduleRef>
+      <eskd-pi:moduleRef>eskd_binding</eskd-pi:moduleRef>
+    </eskd-pi:requiredModules>
+    <eskd-pi:applicableLifecycleStages>
+      <eskd-pi:stage>S2_DEVELOPMENT</eskd-pi:stage>
+      <eskd-pi:stage>S3_PRODUCTION</eskd-pi:stage>
+      <eskd-pi:stage>S5_REPAIR</eskd-pi:stage>
+    </eskd-pi:applicableLifecycleStages>
+    <eskd-pi:applicableProcesses>
+      <eskd-pi:process>P2.2_DESIGN</eskd-pi:process>
+      <eskd-pi:process>P2.3_INTEGRATION</eskd-pi:process>
+      <eskd-pi:process>P2.4_MAINTENANCE</eskd-pi:process>
+    </eskd-pi:applicableProcesses>
+    <eskd-pi:interoperabilityDegree>0.95</eskd-pi:interoperabilityDegree>
+    <eskd-pi:validationRules>
+      <eskd-pi:ruleRef>schematron/ekb-rerea-1.0.sch</eskd-pi:ruleRef>
+    </eskd-pi:validationRules>
+    <eskd-pi:softwareTools>
+      <eskd-pi:toolRef>СУДИ-КТ</eskd-pi:toolRef>
+      <eskd-pi:toolRef>СНСИ</eskd-pi:toolRef>
+      <eskd-pi:toolRef>САПР-ЭРД</eskd-pi:toolRef>
+    </eskd-pi:softwareTools>
+    <eskd-pi:compatibleProfiles>
+      <eskd-pi:profileRef>nsi-reference-1.0</eskd-pi:profileRef>
+    </eskd-pi:compatibleProfiles>
+    <eskd-pi:externalReferences>
+      <eskd-pi:reference>ГОСТ Р 2.525-2024</eskd-pi:reference>
+      <eskd-pi:reference>ГОСТ Р 2.058-2023</eskd-pi:reference>
+      <eskd-pi:reference>ГОСТ Р 77.302</eskd-pi:reference>
+      <eskd-pi:reference>ГОСТ Р 77.305</eskd-pi:reference>
+    </eskd-pi:externalReferences>
+  </eskd-pi:metadata>
+
+  <!-- =========================================================================
+       РАЗРЕШЁННЫЕ ПЕРЕЧНИ ЭКБ/РЭА
+       ========================================================================= -->
+  <eskd-ekb:allowedComponentLists>
+    
+    <!-- Перечень 1: Базовый перечень ЭКБ -->
+    <eskd-ekb:allowed_component_list id="LIST-001">
+      <eskd-core:description>Базовый перечень разрешённой ЭКБ для изделий связи</eskd-core:description>
+      <eskd-ekb:listId>ПЛ-ЭКБ-2024-001</eskd-ekb:listId>
+      <eskd-ekb:listName>Базовый перечень ЭКБ</eskd-ekb:listName>
+      <eskd-ekb:approvalDocument>
+        <eskd-ekb:documentRef>DOC-ORDER-2024-001</eskd-ekb:documentRef>
+        <eskd-ekb:fragmentRef>Приложение 1</eskd-ekb:fragmentRef>
+      </eskd-ekb:approvalDocument>
+      <eskd-ekb:issuingAuthority>ORG-001</eskd-ekb:issuingAuthority>
+      <eskd-ekb:effectiveDate>2024-01-01</eskd-ekb:effectiveDate>
+      <eskd-ekb:expirationDate>2026-12-31</eskd-ekb:expirationDate>
+      <eskd-ekb:scopeDescription>
+        Применяется для всех изделий связи, разрабатываемых в рамках проекта АБВГ.
+      </eskd-ekb:scopeDescription>
+      <eskd-ekb:applicableProducts>
+        <eskd-ekb:productRef>PROD-001</eskd-ekb:productRef>
+        <eskd-ekb:productRef>PROD-002</eskd-ekb:productRef>
+      </eskd-ekb:applicableProducts>
+      <eskd-ekb:allowedItems>
+        
+        <!-- Позиция 1: Микросхема -->
+        <eskd-ekb:allowed_component_item id="ITEM-001">
+          <eskd-core:description>Микросхема АРУ, отечественный аналог</eskd-core:description>
+          <eskd-ekb:itemId>ПЛ-001</eskd-ekb:itemId>
+          <eskd-ekb:componentRef>PROD-001</eskd-ekb:componentRef>
+          <eskd-ekb:approvalStatus>approved</eskd-ekb:approvalStatus>
+          <eskd-ekb:equivalenceCategory>domestic_analog</eskd-ekb:equivalenceCategory>
+          <eskd-ekb:manufacturer>ORG-002</eskd-ekb:manufacturer>
+          <eskd-ekb:countryOfOrigin>RU</eskd-ekb:countryOfOrigin>
+          <eskd-ekb:applicationConstraints>
+            Температура окружающей среды от -40 до +85°C
+          </eskd-ekb:applicationConstraints>
+          <eskd-ekb:operatingConditions>
+            Напряжение питания 3.3В ±5%, ток потребления до 100мА
+          </eskd-ekb:operatingConditions>
+          <eskd-ekb:qualificationLevel>VP</eskd-ekb:qualificationLevel>
+          <eskd-ekb:criticality>critical</eskd-ekb:criticality>
+          <eskd-ekb:testReportRef>DOC-TEST-001</eskd-ekb:testReportRef>
+          <eskd-ekb:notes>
+            Рекомендуется к применению во всех новых разработках.
+            Полная совместимость с аналогом XYZ-123.
+          </eskd-ekb:notes>
+        </eskd-ekb:allowed_component_item>
+        
+        <!-- Позиция 2: Резистор -->
+        <eskd-ekb:allowed_component_item id="ITEM-002">
+          <eskd-core:description>Резистор постоянный, стандартный</eskd-core:description>
+          <eskd-ekb:itemId>ПЛ-002</eskd-ekb:itemId>
+          <eskd-ekb:componentRef>PROD-002</eskd-ekb:componentRef>
+          <eskd-ekb:approvalStatus>approved</eskd-ekb:approvalStatus>
+          <eskd-ekb:equivalenceCategory>original</eskd-ekb:equivalenceCategory>
+          <eskd-ekb:countryOfOrigin>CN</eskd-ekb:countryOfOrigin>
+          <eskd-ekb:applicationConstraints>
+            Мощность рассеивания 0.25Вт, допуск ±5%
+          </eskd-ekb:applicationConstraints>
+          <eskd-ekb:qualificationLevel>OT</eskd-ekb:qualificationLevel>
+          <eskd-ekb:criticality>standard</eskd-ekb:criticality>
+        </eskd-ekb:allowed_component_item>
+        
+        <!-- Позиция 3: Конденсатор (условно разрешён) -->
+        <eskd-ekb:allowed_component_item id="ITEM-003">
+          <eskd-core:description>Конденсатор керамический</eskd-core:description>
+          <eskd-ekb:itemId>ПЛ-003</eskd-ekb:itemId>
+          <eskd-ekb:componentRef>PROD-003</eskd-ekb:componentRef>
+          <eskd-ekb:approvalStatus>conditionally</eskd-ekb:approvalStatus>
+          <eskd-ekb:equivalenceCategory>foreign_analog</eskd-ekb:equivalenceCategory>
+          <eskd-ekb:countryOfOrigin>US</eskd-ekb:countryOfOrigin>
+          <eskd-ekb:applicationConstraints>
+            Только для изделий гражданского назначения.
+            Требуется дополнительная проверка партии.
+          </eskd-ekb:applicationConstraints>
+          <eskd-ekb:qualificationLevel>OT</eskd-ekb:qualificationLevel>
+          <eskd-ekb:criticality>important</eskd-ekb:criticality>
+          <eskd-ekb:notes>
+            Условное разрешение до 2025-06-30.
+            Требуется поиск отечественного аналога.
+          </eskd-ekb:notes>
+        </eskd-ekb:allowed_component_item>
+        
+      </eskd-ekb:allowedItems>
+    </eskd-ekb:allowed_component_list>
+    
+  </eskd-ekb:allowedComponentLists>
+
+  <!-- =========================================================================
+       ГРУППЫ ДОПУСТИМЫХ ЗАМЕН
+       ========================================================================= -->
+  <eskd-ekb:replacementGroups>
+    
+    <!-- Группа замен 1: Микросхема АРУ -->
+    <eskd-ekb:replacement_group id="REPL-GRP-001">
+      <eskd-core:description>
+        Группа допустимых замен для микросхемы АРУ-123
+      </eskd-core:description>
+      <eskd-ekb:groupId>ГЗ-001</eskd-ekb:groupId>
+      <eskd-ekb:baseComponentRef>PROD-001</eskd-ekb:baseComponentRef>
+      <eskd-ekb:replacementReason>
+        Обеспечение непрерывности поставок при дефиците основного компонента.
+        Санкционные ограничения на поставку иностранных аналогов.
+      </eskd-ekb:replacementReason>
+      <eskd-ekb:replacementItems>
+        
+        <!-- Замена 1: Отечественный аналог (приоритет 1) -->
+        <eskd-ekb:replacement_item id="REPL-001">
+          <eskd-core:description>Отечественный аналог, полный эквивалент</eskd-core:description>
+          <eskd-ekb:replacementProductRef>PROD-004</eskd-ekb:replacementProductRef>
+          <eskd-ekb:priority>1</eskd-ekb:priority>
+          <eskd-ekb:equivalenceLevel>full</eskd-ekb:equivalenceLevel>
+          <eskd-ekb:usageConditions>
+            Применяется без дополнительных изменений в конструкции.
+            Требуется обновление спецификации.
+          </eskd-ekb:usageConditions>
+          <eskd-ekb:approvalDocumentRef>DOC-APPROVAL-001</eskd-ekb:approvalDocumentRef>
+          <eskd-ekb:impactAnalysis>
+            Влияние на конструкцию: отсутствует.
+            Влияние на технологию: отсутствует.
+            Влияние на надёжность: положительное (отечественное производство).
+          </eskd-ekb:impactAnalysis>
+        </eskd-ekb:replacement_item>
+        
+        <!-- Замена 2: Иностранный аналог (приоритет 2) -->
+        <eskd-ekb:replacement_item id="REPL-002">
+          <eskd-core:description>Иностранный аналог, функциональный эквивалент</eskd-core:description>
+          <eskd-ekb:replacementProductRef>PROD-005</eskd-ekb:replacementProductRef>
+          <eskd-ekb:priority>2</eskd-ekb:priority>
+          <eskd-ekb:equivalenceLevel>functional</eskd-ekb:equivalenceLevel>
+          <eskd-ekb:usageConditions>
+            Требуется проверка электрических характеристик.
+            Возможно изменение посадочного места.
+          </eskd-ekb:usageConditions>
+          <eskd-ekb:approvalDocumentRef>DOC-APPROVAL-002</eskd-ekb:approvalDocumentRef>
+          <eskd-ekb:impactAnalysis>
+            Влияние на конструкцию: требуется проверка посадочного места.
+            Влияние на технологию: требуется корректировка технологического процесса.
+            Влияние на надёжность: требует дополнительных испытаний.
+          </eskd-ekb:impactAnalysis>
+        </eskd-ekb:replacement_item>
+        
+      </eskd-ekb:replacementItems>
+    </eskd-ekb:replacement_group>
+    
+  </eskd-ekb:replacementGroups>
+
+  <!-- =========================================================================
+       ДЕКЛАРАЦИИ СООТВЕТСТВИЯ
+       ========================================================================= -->
+  <eskd-ekb:complianceAssertions>
+    
+    <!-- Декларация 1: Изделие АБВГ.123456.001 -->
+    <eskd-ekb:compliance_assertion id="ASSERT-001">
+      <eskd-core:description>
+        Декларация соответствия изделия АБВГ.123456.001 разрешённому перечню ЭКБ
+      </eskd-core:description>
+      <eskd-ekb:assertionId>ДС-2025-001</eskd-ekb:assertionId>
+      <eskd-ekb:productRef>PROD-001</eskd-ekb:productRef>
+      <eskd-ekb:allowedListRef>LIST-001</eskd-ekb:allowedListRef>
+      <eskd-ekb:complianceLevel>full</eskd-ekb:complianceLevel>
+      <eskd-ekb:verificationDate>2025-01-10</eskd-ekb:verificationDate>
+      <eskd-ekb:verifierRef>ORG-001</eskd-ekb:verifierRef>
+      <eskd-ekb:verificationMethod>automatic</eskd-ekb:verificationMethod>
+      <eskd-ekb:validUntil>2025-12-31</eskd-ekb:validUntil>
+    </eskd-ekb:compliance_assertion>
+    
+    <!-- Декларация 2: Изделие АБВГ.123456.002 (частичное соответствие) -->
+    <eskd-ekb:compliance_assertion id="ASSERT-002">
+      <eskd-core:description>
+        Декларация соответствия изделия АБВГ.123456.002 с исключениями
+      </eskd-core:description>
+      <eskd-ekb:assertionId>ДС-2025-002</eskd-ekb:assertionId>
+      <eskd-ekb:productRef>PROD-002</eskd-ekb:productRef>
+      <eskd-ekb:allowedListRef>LIST-001</eskd-ekb:allowedListRef>
+      <eskd-ekb:complianceLevel>partial</eskd-ekb:complianceLevel>
+      <eskd-ekb:nonCompliantItems>
+        PROD-003 (Конденсатор керамический) - условно разрешён, 
+        требуется замена на отечественный аналог до 2025-06-30.
+        PROD-007 (Микросхема FPGA) - отсутствует в перечне, 
+        требуется включение в перечень или замена.
+      </eskd-ekb:nonCompliantItems>
+      <eskd-ekb:verificationDate>2025-01-12</eskd-ekb:verificationDate>
+      <eskd-ekb:verifierRef>ORG-001</eskd-ekb:verifierRef>
+      <eskd-ekb:verificationMethod>mixed</eskd-ekb:verificationMethod>
+      <eskd-ekb:validUntil>2025-06-30</eskd-ekb:validUntil>
+    </eskd-ekb:compliance_assertion>
+    
+  </eskd-ekb:complianceAssertions>
+
+</eskd-ekb:EkbProfileRoot>

@@ -1,0 +1,412 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ============================================================================
+  ПРИМЕР ВАЛИДНОГО XML: ПРОФИЛЬ НСИ
+  ============================================================================
+  Профиль: nsi-reference-1.0
+  Namespace: http://gost.ru/eskd/profile/nsi/2024
+  Основано на: ГОСТ Р 77.403, ГОСТ Р 77.302, ГОСТ Р 77.402
+  ============================================================================
+-->
+<eskd-nsi:NsiProfileRoot 
+    xmlns:eskd-nsi="http://gost.ru/eskd/profile/nsi/2024"
+    xmlns:eskd-core="http://gost.ru/eskd/core/2024"
+    xmlns:eskd-pi="http://gost.ru/eskd/profile/interface/2024"
+    xmlns:eskd-2525="http://gost.ru/eskd/2.525/2024"
+    xmlns:eskd-2058="http://gost.ru/eskd/2.058/2023"
+    profileNamespace="http://gost.ru/eskd/profile/nsi/2024"
+    generatedDate="2025-01-15T11:00:00"
+    sourceSystem="НСИ-Мастер v3.1">
+
+  <!-- =========================================================================
+       МЕТАДАННЫЕ ПРОФИЛЯ (обязательно по контракту ProfileMetadataType)
+       ========================================================================= -->
+  <eskd-pi:metadata>
+    <eskd-pi:profileId>nsi-reference-1.0</eskd-pi:profileId>
+    <eskd-pi:profileVersion>1.0</eskd-pi:profileVersion>
+    <eskd-pi:profileName>Нормативно-справочная информация</eskd-pi:profileName>
+    <eskd-pi:description>
+      Обмен классификаторами и справочниками между PLM-системами. 
+      Централизованное хранение критически важных данных организации, 
+      управление справочниками и классификаторами НСИ.
+    </eskd-pi:description>
+    <eskd-pi:requiredModules>
+      <eskd-pi:moduleRef>eskd_core</eskd-pi:moduleRef>
+      <eskd-pi:moduleRef>eskd_2.525_module</eskd-pi:moduleRef>
+      <eskd-pi:moduleRef>eskd_2.058_module</eskd-pi:moduleRef>
+    </eskd-pi:requiredModules>
+    <eskd-pi:applicableLifecycleStages>
+      <eskd-pi:stage>S1_RESEARCH</eskd-pi:stage>
+      <eskd-pi:stage>S2_DEVELOPMENT</eskd-pi:stage>
+      <eskd-pi:stage>S3_PRODUCTION</eskd-pi:stage>
+      <eskd-pi:stage>S4_OPERATION</eskd-pi:stage>
+    </eskd-pi:applicableLifecycleStages>
+    <eskd-pi:applicableProcesses>
+      <eskd-pi:process>P1.3_CONFIG</eskd-pi:process>
+      <eskd-pi:process>P2.1_REQUIREMENTS</eskd-pi:process>
+      <eskd-pi:process>P3.1_INFO</eskd-pi:process>
+    </eskd-pi:applicableProcesses>
+    <eskd-pi:interoperabilityDegree>0.90</eskd-pi:interoperabilityDegree>
+    <eskd-pi:validationRules>
+      <eskd-pi:ruleRef>schematron/nsi-reference-1.0.sch</eskd-pi:ruleRef>
+    </eskd-pi:validationRules>
+    <eskd-pi:softwareTools>
+      <eskd-pi:toolRef>СНСИ</eskd-pi:toolRef>
+      <eskd-pi:toolRef>СУДИ-КТ</eskd-pi:toolRef>
+      <eskd-pi:toolRef>СЭДО</eskd-pi:toolRef>
+    </eskd-pi:softwareTools>
+    <eskd-pi:compatibleProfiles>
+      <eskd-pi:profileRef>ekb-rerea-1.0</eskd-pi:profileRef>
+      <eskd-pi:profileRef>stdparts-catalog-1.0</eskd-pi:profileRef>
+    </eskd-pi:compatibleProfiles>
+    <eskd-pi:externalReferences>
+      <eskd-pi:reference>ГОСТ Р 77.302</eskd-pi:reference>
+      <eskd-pi:reference>ГОСТ Р 77.402</eskd-pi:reference>
+    </eskd-pi:externalReferences>
+  </eskd-pi:metadata>
+
+  <!-- =========================================================================
+       КЛАССИФИКАТОРЫ НСИ
+       ========================================================================= -->
+  <eskd-nsi:classifiers>
+    
+    <!-- Классификатор 1: Виды изделий -->
+    <eskd-nsi:classifier id="CLF-001">
+      <eskd-core:description>Классификатор видов изделий по ГОСТ 23945.0</eskd-core:description>
+      <eskd-nsi:classifierCode>INTERNAL</eskd-nsi:classifierCode>
+      <eskd-nsi:classifierName>Виды изделий</eskd-nsi:classifierName>
+      <eskd-nsi:classifierVersion>1.0</eskd-nsi:classifierVersion>
+      <eskd-nsi:approvalDocument>DOC-STD-001</eskd-nsi:approvalDocument>
+      <eskd-nsi:effectiveDate>2024-01-01</eskd-nsi:effectiveDate>
+      <eskd-nsi:entries>
+        
+        <!-- Запись 1: Сборочная единица -->
+        <eskd-nsi:entry id="ENTRY-001">
+          <eskd-core:description>Сборочная единица - изделие, составные части подлежат соединению</eskd-core:description>
+          <eskd-nsi:code>001</eskd-nsi:code>
+          <eskd-nsi:name>Сборочная единица</eskd-nsi:name>
+          <eskd-nsi:hierarchyLevel>1</eskd-nsi:hierarchyLevel>
+          <eskd-nsi:status>active</eskd-nsi:status>
+          <eskd-nsi:synonyms>
+            <eskd-nsi:synonym>Сборка</eskd-nsi:synonym>
+            <eskd-nsi:synonym>Assembly</eskd-nsi:synonym>
+          </eskd-nsi:synonyms>
+          <eskd-nsi:attributes>
+            <eskd-nsi:attribute>
+              <eskd-nsi:name>Код ЕСКД</eskd-nsi:name>
+              <eskd-nsi:value>А</eskd-nsi:value>
+              <eskd-nsi:type>string</eskd-nsi:type>
+            </eskd-nsi:attribute>
+            <eskd-nsi:attribute>
+              <eskd-nsi:name>Уровень иерархии</eskd-nsi:name>
+              <eskd-nsi:value>1</eskd-nsi:value>
+              <eskd-nsi:type>integer</eskd-nsi:type>
+            </eskd-nsi:attribute>
+          </eskd-nsi:attributes>
+        </eskd-nsi:entry>
+        
+        <!-- Запись 2: Деталь -->
+        <eskd-nsi:entry id="ENTRY-002">
+          <eskd-core:description>Деталь - изделие, изготовленное из однородного материала</eskd-core:description>
+          <eskd-nsi:code>002</eskd-nsi:code>
+          <eskd-nsi:name>Деталь</eskd-nsi:name>
+          <eskd-nsi:parentCode>001</eskd-nsi:parentCode>
+          <eskd-nsi:hierarchyLevel>2</eskd-nsi:hierarchyLevel>
+          <eskd-nsi:status>active</eskd-nsi:status>
+          <eskd-nsi:synonyms>
+            <eskd-nsi:synonym>Part</eskd-nsi:synonym>
+          </eskd-nsi:synonyms>
+          <eskd-nsi:attributes>
+            <eskd-nsi:attribute>
+              <eskd-nsi:name>Код ЕСКД</eskd-nsi:name>
+              <eskd-nsi:value>Б</eskd-nsi:value>
+              <eskd-nsi:type>string</eskd-nsi:type>
+            </eskd-nsi:attribute>
+          </eskd-nsi:attributes>
+        </eskd-nsi:entry>
+        
+        <!-- Запись 3: Комплект -->
+        <eskd-nsi:entry id="ENTRY-003">
+          <eskd-core:description>Комплект - два и более изделия, не соединённые сборочными операциями</eskd-core:description>
+          <eskd-nsi:code>003</eskd-nsi:code>
+          <eskd-nsi:name>Комплект</eskd-nsi:name>
+          <eskd-nsi:hierarchyLevel>1</eskd-nsi:hierarchyLevel>
+          <eskd-nsi:status>active</eskd-nsi:status>
+          <eskd-nsi:attributes>
+            <eskd-nsi:attribute>
+              <eskd-nsi:name>Код ЕСКД</eskd-nsi:name>
+              <eskd-nsi:value>К</eskd-nsi:value>
+              <eskd-nsi:type>string</eskd-nsi:type>
+            </eskd-nsi:attribute>
+          </eskd-nsi:attributes>
+        </eskd-nsi:entry>
+        
+        <!-- Запись 4: Комплекс -->
+        <eskd-nsi:entry id="ENTRY-004">
+          <eskd-core:description>Комплекс - два и более изделия, объединённые общей функцией</eskd-core:description>
+          <eskd-nsi:code>004</eskd-nsi:code>
+          <eskd-nsi:name>Комплекс</eskd-nsi:name>
+          <eskd-nsi:hierarchyLevel>1</eskd-nsi:hierarchyLevel>
+          <eskd-nsi:status>active</eskd-nsi:status>
+          <eskd-nsi:attributes>
+            <eskd-nsi:attribute>
+              <eskd-nsi:name>Код ЕСКД</eskd-nsi:name>
+              <eskd-nsi:value>Э</eskd-nsi:value>
+              <eskd-nsi:type>string</eskd-nsi:type>
+            </eskd-nsi:attribute>
+          </eskd-nsi:attributes>
+        </eskd-nsi:entry>
+        
+      </eskd-nsi:entries>
+    </eskd-nsi:classifier>
+    
+    <!-- Классификатор 2: ОКПД2 (фрагмент) -->
+    <eskd-nsi:classifier id="CLF-002">
+      <eskd-core:description>ОКПД2 - Общероссийский классификатор продукции по видам экономической деятельности</eskd-core:description>
+      <eskd-nsi:classifierCode>OKPD2</eskd-nsi:classifierCode>
+      <eskd-nsi:classifierName>ОКПД2</eskd-nsi:classifierName>
+      <eskd-nsi:classifierVersion>2024.1</eskd-nsi:classifierVersion>
+      <eskd-nsi:effectiveDate>2024-01-01</eskd-nsi:effectiveDate>
+      <eskd-nsi:entries>
+        
+        <eskd-nsi:entry id="ENTRY-005">
+          <eskd-nsi:code>28.29</eskd-nsi:code>
+          <eskd-nsi:name>Машины и оборудование общего назначения прочие</eskd-nsi:name>
+          <eskd-nsi:hierarchyLevel>2</eskd-nsi:hierarchyLevel>
+          <eskd-nsi:status>active</eskd-nsi:status>
+        </eskd-nsi:entry>
+        
+        <eskd-nsi:entry id="ENTRY-006">
+          <eskd-nsi:code>28.29.84</eskd-nsi:code>
+          <eskd-nsi:name>Части оборудования, не имеющие электрических соединений</eskd-nsi:name>
+          <eskd-nsi:parentCode>28.29</eskd-nsi:parentCode>
+          <eskd-nsi:hierarchyLevel>3</eskd-nsi:hierarchyLevel>
+          <eskd-nsi:status>active</eskd-nsi:status>
+        </eskd-nsi:entry>
+        
+      </eskd-nsi:entries>
+    </eskd-nsi:classifier>
+    
+  </eskd-nsi:classifiers>
+
+  <!-- =========================================================================
+       СПРАВОЧНИКИ НСИ
+       ========================================================================= -->
+  <eskd-nsi:referenceBooks>
+    
+    <!-- Справочник 1: Единицы измерения -->
+    <eskd-nsi:referenceBook id="REF-001">
+      <eskd-core:description>Справочник единиц измерения по ОКЕИ</eskd-core:description>
+      <eskd-nsi:referenceType>units</eskd-nsi:referenceType>
+      <eskd-nsi:referenceName>Единицы измерения</eskd-nsi:referenceName>
+      <eskd-nsi:referenceVersion>1.0</eskd-nsi:referenceVersion>
+      <eskd-nsi:owner>ORG-001</eskd-nsi:owner>
+      <eskd-nsi:effectiveDate>2024-01-01</eskd-nsi:effectiveDate>
+      <eskd-nsi:records>
+        
+        <eskd-nsi:record id="REC-001">
+          <eskd-core:description>Миллиметр - единица длины</eskd-core:description>
+          <eskd-nsi:recordId>MMT</eskd-nsi:recordId>
+          <eskd-nsi:status>active</eskd-nsi:status>
+          <eskd-nsi:attributes>
+            <eskd-nsi:attribute>
+              <eskd-nsi:name>Наименование</eskd-nsi:name>
+              <eskd-nsi:value>Миллиметр</eskd-nsi:value>
+              <eskd-nsi:type>string</eskd-nsi:type>
+            </eskd-nsi:attribute>
+            <eskd-nsi:attribute>
+              <eskd-nsi:name>Код ОКЕИ</eskd-nsi:name>
+              <eskd-nsi:value>17</eskd-nsi:value>
+              <eskd-nsi:type>integer</eskd-nsi:type>
+            </eskd-nsi:attribute>
+            <eskd-nsi:attribute>
+              <eskd-nsi:name>Обозначение русское</eskd-nsi:name>
+              <eskd-nsi:value>мм</eskd-nsi:value>
+              <eskd-nsi:type>string</eskd-nsi:type>
+            </eskd-nsi:attribute>
+            <eskd-nsi:attribute>
+              <eskd-nsi:name>Обозначение международное</eskd-nsi:name>
+              <eskd-nsi:value>mm</eskd-nsi:value>
+              <eskd-nsi:type>string</eskd-nsi:type>
+            </eskd-nsi:attribute>
+          </eskd-nsi:attributes>
+        </eskd-nsi:record>
+        
+        <eskd-nsi:record id="REC-002">
+          <eskd-core:description>Килограмм - единица массы</eskd-core:description>
+          <eskd-nsi:recordId>KGM</eskd-nsi:recordId>
+          <eskd-nsi:status>active</eskd-nsi:status>
+          <eskd-nsi:attributes>
+            <eskd-nsi:attribute>
+              <eskd-nsi:name>Наименование</eskd-nsi:name>
+              <eskd-nsi:value>Килограмм</eskd-nsi:value>
+              <eskd-nsi:type>string</eskd-nsi:type>
+            </eskd-nsi:attribute>
+            <eskd-nsi:attribute>
+              <eskd-nsi:name>Код ОКЕИ</eskd-nsi:name>
+              <eskd-nsi:value>11</eskd-nsi:value>
+              <eskd-nsi:type>integer</eskd-nsi:type>
+            </eskd-nsi:attribute>
+            <eskd-nsi:attribute>
+              <eskd-nsi:name>Обозначение русское</eskd-nsi:name>
+              <eskd-nsi:value>кг</eskd-nsi:value>
+              <eskd-nsi:type>string</eskd-nsi:type>
+            </eskd-nsi:attribute>
+            <eskd-nsi:attribute>
+              <eskd-nsi:name>Обозначение международное</eskd-nsi:name>
+              <eskd-nsi:value>kg</eskd-nsi:value>
+              <eskd-nsi:type>string</eskd-nsi:type>
+            </eskd-nsi:attribute>
+          </eskd-nsi:attributes>
+        </eskd-nsi:record>
+        
+        <eskd-nsi:record id="REC-003">
+          <eskd-core:description>Штука - единица количества</eskd-core:description>
+          <eskd-nsi:recordId>PCE</eskd-nsi:recordId>
+          <eskd-nsi:status>active</eskd-nsi:status>
+          <eskd-nsi:attributes>
+            <eskd-nsi:attribute>
+              <eskd-nsi:name>Наименование</eskd-nsi:name>
+              <eskd-nsi:value>Штука</eskd-nsi:value>
+              <eskd-nsi:type>string</eskd-nsi:type>
+            </eskd-nsi:attribute>
+            <eskd-nsi:attribute>
+              <eskd-nsi:name>Код ОКЕИ</eskd-nsi:name>
+              <eskd-nsi:value>796</eskd-nsi:value>
+              <eskd-nsi:type>integer</eskd-nsi:type>
+            </eskd-nsi:attribute>
+            <eskd-nsi:attribute>
+              <eskd-nsi:name>Обозначение русское</eskd-nsi:name>
+              <eskd-nsi:value>шт.</eskd-nsi:value>
+              <eskd-nsi:type>string</eskd-nsi:type>
+            </eskd-nsi:attribute>
+            <eskd-nsi:attribute>
+              <eskd-nsi:name>Обозначение международное</eskd-nsi:name>
+              <eskd-nsi:value>pce</eskd-nsi:value>
+              <eskd-nsi:type>string</eskd-nsi:type>
+            </eskd-nsi:attribute>
+          </eskd-nsi:attributes>
+        </eskd-nsi:record>
+        
+      </eskd-nsi:records>
+    </eskd-nsi:referenceBook>
+    
+    <!-- Справочник 2: Организации -->
+    <eskd-nsi:referenceBook id="REF-002">
+      <eskd-core:description>Справочник организаций-участников кооперации</eskd-core:description>
+      <eskd-nsi:referenceType>organizations</eskd-nsi:referenceType>
+      <eskd-nsi:referenceName>Организации</eskd-nsi:referenceName>
+      <eskd-nsi:referenceVersion>2.1</eskd-nsi:referenceVersion>
+      <eskd-nsi:owner>ORG-001</eskd-nsi:owner>
+      <eskd-nsi:effectiveDate>2024-06-01</eskd-nsi:effectiveDate>
+      <eskd-nsi:records>
+        
+        <eskd-nsi:record id="REC-004">
+          <eskd-core:description>АО "Организация001" - разработчик</eskd-core:description>
+          <eskd-nsi:recordId>ORG-001</eskd-nsi:recordId>
+          <eskd-nsi:status>active</eskd-nsi:status>
+          <eskd-nsi:attributes>
+            <eskd-nsi:attribute>
+              <eskd-nsi:name>Полное наименование</eskd-nsi:name>
+              <eskd-nsi:value>Акционерное общество "Организация001"</eskd-nsi:value>
+              <eskd-nsi:type>string</eskd-nsi:type>
+            </eskd-nsi:attribute>
+            <eskd-nsi:attribute>
+              <eskd-nsi:name>Сокращённое наименование</eskd-nsi:name>
+              <eskd-nsi:value>АО "Организация001"</eskd-nsi:value>
+              <eskd-nsi:type>string</eskd-nsi:type>
+            </eskd-nsi:attribute>
+            <eskd-nsi:attribute>
+              <eskd-nsi:name>ИНН</eskd-nsi:name>
+              <eskd-nsi:value>7725792300</eskd-nsi:value>
+              <eskd-nsi:type>string</eskd-nsi:type>
+            </eskd-nsi:attribute>
+            <eskd-nsi:attribute>
+              <eskd-nsi:name>КПП</eskd-nsi:name>
+              <eskd-nsi:value>772501001</eskd-nsi:value>
+              <eskd-nsi:type>string</eskd-nsi:type>
+            </eskd-nsi:attribute>
+            <eskd-nsi:attribute>
+              <eskd-nsi:name>Роль</eskd-nsi:name>
+              <eskd-nsi:value>Разработчик, Владелец подлинников</eskd-nsi:value>
+              <eskd-nsi:type>string</eskd-nsi:type>
+            </eskd-nsi:attribute>
+          </eskd-nsi:attributes>
+          <eskd-nsi:relatedRecords>
+            <eskd-nsi:relatedRecord>
+              <eskd-nsi:recordRef>REC-005</eskd-nsi:recordRef>
+              <eskd-nsi:relationType>Изготовитель</eskd-nsi:relationType>
+            </eskd-nsi:relatedRecord>
+          </eskd-nsi:relatedRecords>
+        </eskd-nsi:record>
+        
+        <eskd-nsi:record id="REC-005">
+          <eskd-core:description>АО "Организация002" - изготовитель</eskd-core:description>
+          <eskd-nsi:recordId>ORG-002</eskd-nsi:recordId>
+          <eskd-nsi:status>active</eskd-nsi:status>
+          <eskd-nsi:attributes>
+            <eskd-nsi:attribute>
+              <eskd-nsi:name>Полное наименование</eskd-nsi:name>
+              <eskd-nsi:value>Акционерное общество "Организация002"</eskd-nsi:value>
+              <eskd-nsi:type>string</eskd-nsi:type>
+            </eskd-nsi:attribute>
+            <eskd-nsi:attribute>
+              <eskd-nsi:name>Сокращённое наименование</eskd-nsi:name>
+              <eskd-nsi:value>АО "Организация002"</eskd-nsi:value>
+              <eskd-nsi:type>string</eskd-nsi:type>
+            </eskd-nsi:attribute>
+            <eskd-nsi:attribute>
+              <eskd-nsi:name>ИНН</eskd-nsi:name>
+              <eskd-nsi:value>7632992199</eskd-nsi:value>
+              <eskd-nsi:type>string</eskd-nsi:type>
+            </eskd-nsi:attribute>
+            <eskd-nsi:attribute>
+              <eskd-nsi:name>Роль</eskd-nsi:name>
+              <eskd-nsi:value>Изготовитель, Поставщик</eskd-nsi:value>
+              <eskd-nsi:type>string</eskd-nsi:type>
+            </eskd-nsi:attribute>
+          </eskd-nsi:attributes>
+        </eskd-nsi:record>
+        
+      </eskd-nsi:records>
+    </eskd-nsi:referenceBook>
+    
+  </eskd-nsi:referenceBooks>
+
+  <!-- =========================================================================
+       МАППИНГИ НСИ (для интеграции между системами)
+       ========================================================================= -->
+  <eskd-nsi:nsiMappings>
+    
+    <eskd-nsi:nsi_mapping id="MAP-001">
+      <eskd-core:description>
+        Маппинг справочника единиц измерения между PLM-Система А и PLM-Система Б
+      </eskd-core:description>
+      <eskd-nsi:sourceSystem>PLM-Система А</eskd-nsi:sourceSystem>
+      <eskd-nsi:targetSystem>PLM-Система Б</eskd-nsi:targetSystem>
+      <eskd-nsi:mappings>
+        
+        <eskd-nsi:mapping>
+          <eskd-nsi:sourceRef>REC-001</eskd-nsi:sourceRef>
+          <eskd-nsi:targetRef>UNIT-MM-001</eskd-nsi:targetRef>
+          <eskd-nsi:mappingType>direct</eskd-nsi:mappingType>
+        </eskd-nsi:mapping>
+        
+        <eskd-nsi:mapping>
+          <eskd-nsi:sourceRef>REC-002</eskd-nsi:sourceRef>
+          <eskd-nsi:targetRef>UNIT-KG-001</eskd-nsi:targetRef>
+          <eskd-nsi:mappingType>direct</eskd-nsi:mappingType>
+        </eskd-nsi:mapping>
+        
+        <eskd-nsi:mapping>
+          <eskd-nsi:sourceRef>REC-003</eskd-nsi:sourceRef>
+          <eskd-nsi:targetRef>UNIT-PCS-001</eskd-nsi:targetRef>
+          <eskd-nsi:mappingType>direct</eskd-nsi:mappingType>
+        </eskd-nsi:mapping>
+        
+      </eskd-nsi:mappings>
+    </eskd-nsi:nsi_mapping>
+    
+  </eskd-nsi:nsiMappings>
+
+</eskd-nsi:NsiProfileRoot>

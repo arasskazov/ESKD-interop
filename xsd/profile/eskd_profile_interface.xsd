@@ -1,0 +1,276 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ============================================================================
+  ИНТЕРФЕЙС ПРОФИЛЯ ИНТЕРОПЕРАБЕЛЬНОСТИ
+  ============================================================================
+  Основано на:
+  - ГОСТ Р 77.403 (Профили интероперабельности)
+  - ГОСТ Р 2.525-2024 (Электронная структура изделия)
+  - ГОСТ Р 2.058-2023 (Реквизитная часть КД)
+  
+  Назначение:
+  Контракт профиля интероперабельности. Определяет обязательные метаданные
+  и структуру корневого элемента для всех профилей.
+  
+  НЕ содержит:
+  - API-типы (ValidationRequest, ValidationResult)
+  - Сервисные концепции
+  - Платформенные расширения
+  ============================================================================
+-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:eskd-core="http://gost.ru/eskd/core/2024"
+           xmlns:eskd-pi="http://gost.ru/eskd/profile/interface/2024"
+           targetNamespace="http://gost.ru/eskd/profile/interface/2024"
+           elementFormDefault="qualified"
+           attributeFormDefault="unqualified"
+           version="0.2"
+           xml:lang="ru"
+           xmlns:vc="http://www.w3.org/2007/XMLSchema-versioning"
+           vc:minVersion="1.1">
+
+  <xs:import namespace="http://gost.ru/eskd/core/2024"
+             schemaLocation="../core/eskd_core.xsd"/>
+
+  <xs:annotation>
+    <xs:documentation>
+      ИНТЕРФЕЙС ПРОФИЛЯ ИНТЕРОПЕРАБЕЛЬНОСТИ.
+      
+      Содержит:
+      - ProfileMetadataType (обязательные метаданные профиля)
+      - ProfileRootType (абстрактный корневой тип для наследования)
+      - ProfileRoot (абстрактный корневой элемент для substitutionGroup)
+      
+      НЕ содержит:
+      - ValidationRequestType (API-концепция)
+      - ValidationResultType (API-концепция)
+      - Сервисные и платформенные концепции
+    </xs:documentation>
+  </xs:annotation>
+
+  <!-- ========================================================================
+       РАЗДЕЛ 1: МЕТАДАННЫЕ ПРОФИЛЯ (ОБЯЗАТЕЛЬНЫЕ)
+       ======================================================================== -->
+
+  <xs:complexType name="ProfileMetadataType">
+    <xs:annotation>
+      <xs:documentation>
+        Обязательные метаданные любого профиля интероперабельности.
+        Согласно ГОСТ Р 77.403, профиль должен содержать идентификатор,
+        версию, описание и метрику степени интероперабельности.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="profileId" type="eskd-core:CodeString" minOccurs="1" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>
+            Уникальный идентификатор профиля в формате {domain}-{purpose}-{version}.
+            Примеры: "ekb-rerea-1.0", "nsi-reference-1.0"
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      
+      <xs:element name="profileVersion" type="eskd-core:VersionString" minOccurs="1" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>
+            Версия профиля интероперабельности.
+            Формат: мажорная.минорная.патч (например, "1.0.0")
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      
+      <xs:element name="profileName" type="eskd-core:ShortText" minOccurs="1" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>
+            Человекочитаемое наименование профиля.
+            Пример: "Разрешённые перечни РЭА/ЭКБ"
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      
+      <xs:element name="description" type="eskd-core:LongText" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>
+            Подробное описание назначения профиля и области применения.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      
+      <xs:element name="requiredModules" minOccurs="1" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>
+            Список модулей ядра, требуемых для данного профиля.
+            Определяет зависимости профиля от базовых схем.
+          </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="moduleRef" type="eskd-core:CodeString" minOccurs="1" maxOccurs="unbounded">
+              <xs:annotation>
+                <xs:documentation>
+                  Ссылка на модуль ядра.
+                  Допустимые значения: "eskd_core", "eskd_2.525_module", "eskd_2.058_module", "eskd_binding"
+                </xs:documentation>
+              </xs:annotation>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      
+      <xs:element name="applicableLifecycleStages" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>
+            Стадии жизненного цикла, на которых применяется профиль.
+            Согласно ГОСТ Р 77.102.
+          </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="stage" type="eskd-core:LifecycleStageEnum" minOccurs="1" maxOccurs="unbounded">
+              <xs:annotation>
+                <xs:documentation>
+                  Стадия ЖЦ: S1_RESEARCH, S2_DEVELOPMENT, S3_PRODUCTION,
+                  S4_OPERATION, S5_REPAIR, S6_UTILIZATION
+                </xs:documentation>
+              </xs:annotation>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      
+      <xs:element name="interoperabilityDegree" type="eskd-core:PercentageType" minOccurs="1" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>
+            Степень интероперабельности (0.00 - 1.00).
+            Рассчитывается по методике ГОСТ Р 77.403.
+            0.00 = нет покрытия требований профиля
+            1.00 = полное покрытие всех требований профиля
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      
+      <xs:element name="externalReferences" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>
+            Внешние нормативные ссылки, применяемые в профиле.
+          </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="reference" type="eskd-core:ShortText" minOccurs="1" maxOccurs="unbounded">
+              <xs:annotation>
+                <xs:documentation>
+                  Нормативный документ (ГОСТ, ISO, отраслевой стандарт).
+                  Пример: "ГОСТ Р 2.525-2024", "ISO 10303-21"
+                </xs:documentation>
+              </xs:annotation>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <!-- ========================================================================
+       РАЗДЕЛ 2: АБСТРАКТНЫЙ КОРНЕВОЙ ТИП ПРОФИЛЯ
+       ======================================================================== -->
+
+  <xs:complexType name="ProfileRootType" abstract="true">
+    <xs:annotation>
+      <xs:documentation>
+        Абстрактный корневой тип для всех профилей интероперабельности.
+        
+        Профиль должен конкретизировать этот тип через расширение (extension).
+        Это обеспечивает единый интерфейс для всех профилей.
+        
+        Пример использования:
+        &lt;xs:element name="EkbProfileRoot" substitutionGroup="eskd-pi:ProfileRoot"&gt;
+          &lt;xs:complexType&gt;
+            &lt;xs:complexContent&gt;
+              &lt;xs:extension base="eskd-pi:ProfileRootType"&gt;
+                ...
+              &lt;/xs:extension&gt;
+            &lt;/xs:complexContent&gt;
+          &lt;/xs:complexType&gt;
+        &lt;/xs:element&gt;
+      </xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="metadata" type="eskd-pi:ProfileMetadataType" minOccurs="1" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>
+            Обязательные метаданные профиля.
+            Должны присутствовать в каждом экземпляре профиля.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      
+      <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:documentation>
+            Профиль добавляет свои элементы через любой элемент из своего namespace.
+            processContents="lax" позволяет валидировать элементы, если схема доступна.
+            
+            Это обеспечивает расширяемость без изменения интерфейса.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:any>
+    </xs:sequence>
+    
+    <xs:attribute name="profileNamespace" type="xs:anyURI" use="required">
+      <xs:annotation>
+        <xs:documentation>
+          Namespace профиля (должен совпадать с targetNamespace схемы профиля).
+          Используется для автоматического определения типа профиля.
+          
+          Пример: "http://gost.ru/eskd/profile/ekb/2024"
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    
+    <xs:attribute name="generatedDate" type="eskd-core:DateTimeType" use="optional">
+      <xs:annotation>
+        <xs:documentation>
+          Дата и время генерации файла обмена.
+          Используется для отслеживания актуальности данных.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+
+  <!-- Абстрактный корневой элемент для substitutionGroup -->
+  <xs:element name="ProfileRoot" type="eskd-pi:ProfileRootType" abstract="true">
+    <xs:annotation>
+      <xs:documentation>
+        Абстрактный корневой элемент для всех профилей.
+        Конкретные профили используют substitutionGroup для наследования.
+      </xs:documentation>
+    </xs:annotation>
+  </xs:element>
+
+  <!-- ========================================================================
+       РАЗДЕЛ 3: ВСПОМОГАТЕЛЬНЫЕ ТИПЫ
+       ======================================================================== -->
+
+  <xs:complexType name="ProfileReferenceType">
+    <xs:annotation>
+      <xs:documentation>
+        Ссылка на профиль интероперабельности.
+        Используется для указания совместимых профилей.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="profileId" type="eskd-core:CodeString" minOccurs="1" maxOccurs="1"/>
+      <xs:element name="profileVersion" type="eskd-core:VersionString" minOccurs="0" maxOccurs="1"/>
+      <xs:element name="compatibilityLevel" minOccurs="0" maxOccurs="1">
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:enumeration value="full"/>
+            <xs:enumeration value="partial"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+</xs:schema>

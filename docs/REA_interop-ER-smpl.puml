@@ -1,0 +1,249 @@
+@startuml
+' ============================================================================
+' УКРУПНЁННАЯ ER-ДИАГРАММА ПРОФИЛЯ ИНТЕРОПЕРАБЕЛЬНОСТИ ЭКБ/РЭА
+' ============================================================================
+
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName "Arial"
+skinparam defaultFontSize 12
+skinparam linetype ortho
+
+' Цветовая схема по модулям
+skinparam entity {
+  BackgroundColor<<2.525>> LightBlue
+  BackgroundColor<<2.058>> LightGreen
+  BackgroundColor<<EKB>> LightYellow
+  BackgroundColor<<Binding>> LightGray
+  BorderColor Black
+  ArrowColor Navy
+}
+
+title Профиль интероперабельности ЭКБ/РЭА (ГОСТ Р 77.403)
+legend top left
+  |<:2.525>| ГОСТ Р 2.525 |
+  |<:2.058>| ГОСТ Р 2.058 |
+  |<:EKB>| Профиль ЭКБ |
+  |<:Binding>| Связывание |
+endlegend
+
+' ============================================================================
+' ГРУППА 1: ИЗДЕЛИЯ (ГОСТ Р 2.525-2024)
+' ============================================================================
+
+rectangle "ИЗДЕЛИЯ (ГОСТ Р 2.525)" as Products {
+  entity "eskd_product\nИзделие" as EP <<2.525>> {
+    *id : Designator
+    *name : ShortText
+    *product_type : Enum
+  }
+  
+  entity "product_definition\nОписание" as PD <<2.525>> {
+    *id : CodeString
+    *formation : IDREF
+  }
+  
+  entity "assembly_component_usage\nВхождение СЧ" as ACU <<2.525>> {
+    *id : CodeString
+    *relating : IDREF
+    *related : IDREF
+  }
+  
+  EP ||--o{ PD : "имеет версии"
+  PD ||--o{ ACU : "содержит"
+}
+
+' ============================================================================
+' ГРУППА 2: ДОКУМЕНТЫ И РЕКВИЗИТЫ (ГОСТ Р 2.058-2023)
+' ============================================================================
+
+rectangle "ДОКУМЕНТЫ (ГОСТ Р 2.058)" as Docs {
+  entity "doc_requisite\nРеквизиты" as DR <<2.058>> {
+    *id : CodeString
+    *designator : Designator
+    *legal_owner : IDREF
+    *creation_date : Date
+  }
+  
+  entity "organization\nОрганизация" as ORG <<2.058>> {
+    *id : CodeString
+    *name : ShortText
+    inn : CodeString
+  }
+  
+  entity "person\nЛицо" as PER <<2.058>> {
+    *id : CodeString
+    *lastName : ShortText
+    position : ShortText
+  }
+  
+  DR }o--|| ORG : "владелец"
+  PER }o--|| ORG : "работает в"
+}
+
+' ============================================================================
+' ГРУППА 3: ПРОФИЛЬ ЭКБ/РЭА (ГОСТ Р 77.403)
+' ============================================================================
+
+rectangle "ПРОФИЛЬ ЭКБ/РЭА" as EKB {
+  entity "allowed_component_list\nРазрешённый перечень" as ACL <<EKB>> {
+    *id : CodeString
+    *listId : Designator
+    *listName : ShortText
+    *effectiveDate : Date
+    expirationDate : Date
+  }
+  
+  entity "allowed_component_item\nПозиция перечня" as ACI <<EKB>> {
+    *id : CodeString
+    *componentRef : IDREF
+    *approvalStatus : Enum
+    *equivalenceCategory : Enum
+    criticality : Enum
+    testReportRef : IDREF
+  }
+  
+  entity "replacement_group\nГруппа замен" as RG <<EKB>> {
+    *id : CodeString
+    *groupId : CodeString
+    *baseComponentRef : IDREF
+  }
+  
+  entity "replacement_item\nЗамена" as RI <<EKB>> {
+    *id : CodeString
+    *replacementProductRef : IDREF
+    *priority : Integer
+    *equivalenceLevel : Enum
+  }
+  
+  entity "compliance_assertion\nДекларация соответствия" as CA <<EKB>> {
+    *id : CodeString
+    *productRef : IDREF
+    *allowedListRef : IDREF
+    *complianceLevel : Enum
+    verificationDate : Date
+    validUntil : Date
+  }
+  
+  ACL ||--|{ ACI : "содержит позиции"
+  RG ||--|{ RI : "содержит замены"
+  CA }o--|| ACL : "по перечню"
+  CA }o--|| EP : "для изделия"
+}
+
+' ============================================================================
+' ГРУППА 4: СВЯЗЫВАНИЕ МОДУЛЕЙ (BINDING)
+' ============================================================================
+
+rectangle "СВЯЗЫВАНИЕ (Binding)" as Binding {
+  entity "productToDocRequisiteMapping\nИзделие ↔ Реквизиты" as PTDRM <<Binding>> {
+    *productRef : IDREF
+    *docRequisiteRef : IDREF
+  }
+  
+  entity "documentToDocRequisiteMapping\nДокумент ↔ Реквизиты" as DTDRM <<Binding>> {
+    *documentRef : IDREF
+    *docRequisiteRef : IDREF
+  }
+  
+  entity "organizationMapping\nОрганизации" as OM <<Binding>> {
+    organization2525Ref : IDREF
+    organization2058Ref : IDREF
+  }
+}
+
+' ============================================================================
+' КЛЮЧЕВЫЕ СВЯЗИ МЕЖДУ ГРУППАМИ
+' ============================================================================
+
+' Изделия ↔ Документы
+EP }o--o{ DR : "связано через Binding"
+
+' Изделия ↔ Профиль ЭКБ
+ACI }o--|| EP : "ссылается на компонент"
+ACI }o--|| ORG : "производитель"
+
+' Документы ↔ Профиль ЭКБ
+ACL }o--|| ORG : "утверждён организацией"
+ACL }o--|| DR : "утверждён документом"
+CA }o--|| PER : "проверено лицом"
+
+' Замены ↔ Структура
+RI }o--|| EP : "заменяет продукт"
+ACI }o--|| RG : "имеет группу замен"
+
+' Binding связи
+EP ||--o{ PTDRM : "сопоставлено"
+DR ||--o{ PTDRM : "сопоставлено"
+ORG ||--o{ OM : "унифицировано"
+
+' ============================================================================
+' БИЗНЕС-ПРАВИЛА (аннотации)
+' ============================================================================
+
+note bottom of ACL
+  <b>Валидация:</b>
+  • expirationDate ≥ effectiveDate
+  • ≥1 позиция в перечне
+  • issuingAuthority существует
+end note
+
+note left of ACI
+  <b>Валидация:</b>
+  • componentRef существует в 2.525
+  • criticality='critical' → testReportRef
+  • approvalStatus='conditionally' → constraints
+end note
+
+note left of CA
+  <b>Валидация:</b>
+  • complianceLevel='partial' → nonCompliantItems
+  • validUntil ≥ verificationDate
+  • verificationDate не в будущем
+end note
+
+note bottom of RG
+  <b>Валидация:</b>
+  • ≥1 замена в группе
+  • priority ≥ 1
+  • baseComponentRef существует
+end note
+
+' ============================================================================
+' УРОВНИ ИНТЕРОПЕРАБЕЛЬНОСТИ
+' ============================================================================
+
+rectangle "УРОВНИ ИНТЕРОПЕРАБЕЛЬНОСТИ" as Levels {
+  note bottom
+    <b>Уровень A (Базовый):</b> 0.50
+    • XSD валидация
+    • Обязательные атрибуты
+    
+    <b>Уровень B (Расширенный):</b> 0.75
+    • ≥70% рекомендуемых атрибутов
+    • ≥80% Schematron правил
+    
+    <b>Уровень C (Полный):</b> 0.95
+    • ≥90% рекомендуемых атрибутов
+    • 100% Schematron правил
+    • 100% Binding валиден
+  end note
+
+
+' ============================================================================
+' ФОРМУЛА РАСЧЁТА
+' ============================================================================
+
+  note bottom
+    <b>ФОРМУЛА СТЕПЕНИ ИНТЕРОПЕРАБЕЛЬНОСТИ</b>
+    <b>I = (M × 0.5) + (R × 0.3) + (S × 0.2)</b>
+    
+    M — обязательные атрибуты (50%)
+    R — рекомендуемые атрибуты (30%)
+    S — правила Schematron (20%)
+  end note
+}
+
+}
+
+@enduml

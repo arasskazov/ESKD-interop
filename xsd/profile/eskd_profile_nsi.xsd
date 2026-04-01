@@ -1,0 +1,701 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:eskd-core="http://gost.ru/eskd/core/2024"
+           xmlns:eskd-bind="http://gost.ru/eskd/binding/2024"
+           xmlns:eskd-pi="http://gost.ru/eskd/profile/interface/2024"
+           xmlns:eskd-nsi="http://gost.ru/eskd/profile/nsi/2024"
+           targetNamespace="http://gost.ru/eskd/profile/nsi/2024"
+           elementFormDefault="qualified"
+           attributeFormDefault="unqualified"
+           version="0.2"
+           xml:lang="ru"
+           xmlns:vc="http://www.w3.org/2007/XMLSchema-versioning"
+           vc:minVersion="1.1">
+
+  <xs:import namespace="http://gost.ru/eskd/core/2024"
+             schemalocation="../core/eskd_core.xsd"/>
+  <xs:import namespace="http://gost.ru/eskd/binding/2024"
+             schemaLocation="eskd_binding.xsd"/>
+  <xs:import namespace="http://gost.ru/eskd/profile/interface/2024"
+             schemaLocation="eskd_profile_interface.xsd"/>
+
+  <xs:annotation>
+    <xs:documentation>
+      ============================================================================
+      ПРОФИЛЬ ИНТЕРОПЕРАБЕЛЬНОСТИ: НОРМАТИВНО-СПРАВОЧНАЯ ИНФОРМАЦИЯ (НСИ)
+      ============================================================================
+      Основано на:
+      - ГОСТ Р 77.403 (Профили интероперабельности)
+      - ГОСТ Р 77.302 (Общие данные об изделии)
+      - ГОСТ Р 77.402 (Программные средства поддержки ЖЦ - СНСИ)
+      - ГОСТ Р 2.525-2024 (Электронная структура изделия)
+      - ГОСТ Р 2.058-2023 (Реквизитная часть КД)
+      
+      Область применения:
+      - Обмен классификаторами и справочниками между PLM-системами
+      - Централизованное хранение критически важных данных организации
+      - Интеграция и систематизация данных между различными системами
+      - Контроль версий и истории изменений объектов НСИ
+      
+      Уровни интероперабельности (ГОСТ Р 77.403):
+      - Семантический: единая модель данных НСИ
+      - Технический: форматы XML + XSD 1.1
+      
+      Программные средства (ГОСТ Р 77.402):
+      - СНСИ (Средства управления НСИ)
+      - СУДИ-КТ (СУДИ конструкторско-технологических данных)
+      - СЭДО (Система электронного документооборота)
+      ============================================================================
+    </xs:documentation>
+  </xs:annotation>
+
+  <!-- ========================================================================
+       РАЗДЕЛ 1: ПРОСТЫЕ ТИПЫ (СПЕЦИФИЧНЫЕ ДЛЯ НСИ)
+       ======================================================================== -->
+
+  <xs:simpleType name="ClassifierCodeEnum">
+    <xs:annotation>
+      <xs:documentation>Код классификатора</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="OKPD2">
+        <xs:annotation><xs:documentation>ОКПД2 (Общероссийский классификатор продукции)</xs:documentation></xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="OKP">
+        <xs:annotation><xs:documentation>ОКП (Общероссийский классификатор продукции)</xs:documentation></xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="OKV">
+        <xs:annotation><xs:documentation>ОКВ (Общероссийский классификатор валют)</xs:documentation></xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="OKEI">
+        <xs:annotation><xs:documentation>ОКЕИ (Общероссийский классификатор единиц измерения)</xs:documentation></xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="OKFS">
+        <xs:annotation><xs:documentation>ОКФС (Общероссийский классификатор форм собственности)</xs:documentation></xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="OKOGU">
+        <xs:annotation><xs:documentation>ОКОГУ (Общероссийский классификатор органов госуправления)</xs:documentation></xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="INTERNAL">
+        <xs:annotation><xs:documentation>Внутренний классификатор организации</xs:documentation></xs:annotation>
+      </xs:enumeration>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="ReferenceTypeEnum">
+    <xs:annotation>
+      <xs:documentation>Тип справочника НСИ</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="materials">
+        <xs:annotation><xs:documentation>Справочник материалов</xs:documentation></xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="units">
+        <xs:annotation><xs:documentation>Справочник единиц измерения</xs:documentation></xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="organizations">
+        <xs:annotation><xs:documentation>Справочник организаций</xs:documentation></xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="persons">
+        <xs:annotation><xs:documentation>Справочник сотрудников</xs:documentation></xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="documents">
+        <xs:annotation><xs:documentation>Справочник документов</xs:documentation></xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="products">
+        <xs:annotation><xs:documentation>Справочник изделий</xs:documentation></xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="equipment">
+        <xs:annotation><xs:documentation>Справочник оборудования</xs:documentation></xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="tools">
+        <xs:annotation><xs:documentation>Справочник инструментов и оснастки</xs:documentation></xs:annotation>
+      </xs:enumeration>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="EntryStatusEnum">
+    <xs:annotation>
+      <xs:documentation>Статус записи в справочнике</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="active">
+        <xs:annotation><xs:documentation>Действующая запись</xs:documentation></xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="archived">
+        <xs:annotation><xs:documentation>Архивированная запись</xs:documentation></xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="draft">
+        <xs:annotation><xs:documentation>Черновик</xs:documentation></xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="pending">
+        <xs:annotation><xs:documentation>На утверждении</xs:documentation></xs:annotation>
+      </xs:enumeration>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="HierarchyLevelEnum">
+    <xs:annotation>
+      <xs:documentation>Уровень иерархии в классификаторе</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:positiveInteger">
+      <xs:minInclusive value="1"/>
+      <xs:maxInclusive value="10"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <!-- ========================================================================
+       РАЗДЕЛ 2: КЛАССИФИКАТОР (CLASSIFIER)
+       ======================================================================== -->
+
+  <xs:complexType name="ClassifierType">
+    <xs:annotation>
+      <xs:documentation>
+        Классификатор НСИ.
+        Наследует от eskd-core:BaseEntityType.
+        Согласно ГОСТ Р 77.302, классификаторы являются частью общих данных об изделии.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="eskd-core:BaseEntityType">
+        <xs:sequence>
+          <xs:element name="classifierCode" type="eskd-nsi:ClassifierCodeEnum" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Код классификатора (обязательно)</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="classifierName" type="eskd-core:ShortText" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Наименование классификатора</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="classifierVersion" type="eskd-core:VersionString" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Версия классификатора</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="approvalDocument" type="xs:IDREF" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>
+                Ссылка на документ об утверждении классификатора (document из 2.525).
+              </xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="effectiveDate" type="eskd-core:DateType" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Дата вступления в силу</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="expirationDate" type="eskd-core:DateType" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Дата окончания действия</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="entries" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Записи классификатора</xs:documentation>
+            </xs:annotation>
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="entry" type="eskd-nsi:ClassifierEntryType" 
+                           minOccurs="1" maxOccurs="unbounded"/>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:element name="classifier" type="eskd-nsi:ClassifierType">
+    <xs:annotation>
+      <xs:documentation>Экземпляр классификатора НСИ</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+
+  <xs:complexType name="ClassifierEntryType">
+    <xs:annotation>
+      <xs:documentation>
+        Запись классификатора.
+        Наследует от eskd-core:BaseEntityType.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="eskd-core:BaseEntityType">
+        <xs:sequence>
+          <xs:element name="code" type="eskd-core:CodeString" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Код записи (обязательно)</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="name" type="eskd-core:ShortText" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Наименование записи</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="parentCode" type="eskd-core:CodeString" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Код родительской записи (для иерархических классификаторов)</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="hierarchyLevel" type="eskd-nsi:HierarchyLevelEnum" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Уровень в иерархии</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="status" type="eskd-nsi:EntryStatusEnum" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Статус записи</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="synonyms" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Синонимы наименования</xs:documentation>
+            </xs:annotation>
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="synonym" type="eskd-core:ShortText" minOccurs="0" maxOccurs="unbounded"/>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+          
+          <xs:element name="attributes" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Дополнительные атрибуты записи</xs:documentation>
+            </xs:annotation>
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="attribute" minOccurs="0" maxOccurs="unbounded">
+                  <xs:complexType>
+                    <xs:sequence>
+                      <xs:element name="name" type="eskd-core:ShortText" minOccurs="1" maxOccurs="1"/>
+                      <xs:element name="value" type="xs:string" minOccurs="1" maxOccurs="1"/>
+                      <xs:element name="type" type="eskd-core:ShortText" minOccurs="0" maxOccurs="1"/>
+                    </xs:sequence>
+                  </xs:complexType>
+                </xs:element>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <!-- ========================================================================
+       РАЗДЕЛ 3: СПРАВОЧНИК (REFERENCE BOOK)
+       ======================================================================== -->
+
+  <xs:complexType name="ReferenceBookType">
+    <xs:annotation>
+      <xs:documentation>
+        Справочник НСИ.
+        Наследует от eskd-core:BaseEntityType.
+        Согласно ГОСТ Р 77.402, управляется средствами СНСИ.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="eskd-core:BaseEntityType">
+        <xs:sequence>
+          <xs:element name="referenceType" type="eskd-nsi:ReferenceTypeEnum" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Тип справочника (обязательно)</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="referenceName" type="eskd-core:ShortText" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Наименование справочника</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="referenceVersion" type="eskd-core:VersionString" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Версия справочника</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="owner" type="xs:IDREF" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>
+                Ссылка на организацию-владельца справочника (organization из 2.058).
+              </xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="effectiveDate" type="eskd-core:DateType" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Дата вступления в силу</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="records" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Записи справочника</xs:documentation>
+            </xs:annotation>
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="record" type="eskd-nsi:ReferenceRecordType" 
+                           minOccurs="1" maxOccurs="unbounded"/>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:element name="referenceBook" type="eskd-nsi:ReferenceBookType">
+    <xs:annotation>
+      <xs:documentation>Экземпляр справочника НСИ</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+
+  <xs:complexType name="ReferenceRecordType">
+    <xs:annotation>
+      <xs:documentation>
+        Запись справочника.
+        Наследует от eskd-core:BaseEntityType.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="eskd-core:BaseEntityType">
+        <xs:sequence>
+          <xs:element name="recordId" type="eskd-core:CodeString" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Идентификатор записи (обязательно)</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="status" type="eskd-nsi:EntryStatusEnum" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Статус записи</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="attributes" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Атрибуты записи</xs:documentation>
+            </xs:annotation>
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="attribute" minOccurs="1" maxOccurs="unbounded">
+                  <xs:complexType>
+                    <xs:sequence>
+                      <xs:element name="name" type="eskd-core:ShortText" minOccurs="1" maxOccurs="1">
+                        <xs:annotation>
+                          <xs:documentation>Наименование атрибута</xs:documentation>
+                        </xs:annotation>
+                      </xs:element>
+                      <xs:element name="value" type="xs:string" minOccurs="1" maxOccurs="1">
+                        <xs:annotation>
+                          <xs:documentation>Значение атрибута</xs:documentation>
+                        </xs:annotation>
+                      </xs:element>
+                      <xs:element name="type" type="eskd-core:ShortText" minOccurs="0" maxOccurs="1">
+                        <xs:annotation>
+                          <xs:documentation>Тип данных атрибута</xs:documentation>
+                        </xs:annotation>
+                      </xs:element>
+                      <xs:element name="unit" type="eskd-core:CodeString" minOccurs="0" maxOccurs="1">
+                        <xs:annotation>
+                          <xs:documentation>Единица измерения (если применимо)</xs:documentation>
+                        </xs:annotation>
+                      </xs:element>
+                    </xs:sequence>
+                  </xs:complexType>
+                </xs:element>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+          
+          <xs:element name="relatedRecords" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Связанные записи</xs:documentation>
+            </xs:annotation>
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="relatedRecord" minOccurs="0" maxOccurs="unbounded">
+                  <xs:complexType>
+                    <xs:sequence>
+                      <xs:element name="recordRef" type="xs:IDREF" minOccurs="1" maxOccurs="1"/>
+                      <xs:element name="relationType" type="eskd-core:ShortText" minOccurs="0" maxOccurs="1"/>
+                    </xs:sequence>
+                  </xs:complexType>
+                </xs:element>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <!-- ========================================================================
+       РАЗДЕЛ 4: МАППИНГ НСИ (NSI MAPPING)
+       ======================================================================== -->
+
+  <xs:complexType name="NsiMappingType">
+    <xs:annotation>
+      <xs:documentation>
+        Маппинг между справочниками НСИ разных систем.
+        Наследует от eskd-core:BaseEntityType.
+        Используется для интеграции данных между PLM-системами.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="eskd-core:BaseEntityType">
+        <xs:sequence>
+          <xs:element name="sourceSystem" type="eskd-core:ShortText" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Система-источник</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="targetSystem" type="eskd-core:ShortText" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Целевая система</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="mappings" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Правила маппинга</xs:documentation>
+            </xs:annotation>
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="mapping" minOccurs="1" maxOccurs="unbounded">
+                  <xs:complexType>
+                    <xs:sequence>
+                      <xs:element name="sourceRef" type="xs:IDREF" minOccurs="1" maxOccurs="1"/>
+                      <xs:element name="targetRef" type="xs:IDREF" minOccurs="1" maxOccurs="1"/>
+                      <xs:element name="mappingType" minOccurs="1" maxOccurs="1">
+                        <xs:simpleType>
+                          <xs:restriction base="xs:string">
+                            <xs:enumeration value="direct"/>
+                            <xs:enumeration value="derived"/>
+                            <xs:enumeration value="manual"/>
+                          </xs:restriction>
+                        </xs:simpleType>
+                      </xs:element>
+                      <xs:element name="transformationRule" type="eskd-core:LongText" minOccurs="0" maxOccurs="1"/>
+                    </xs:sequence>
+                  </xs:complexType>
+                </xs:element>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:element name="nsi_mapping" type="eskd-nsi:NsiMappingType">
+    <xs:annotation>
+      <xs:documentation>Экземпляр маппинга НСИ</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+
+  <!-- ========================================================================
+       РАЗДЕЛ 5: КОРНЕВОЙ ЭЛЕМЕНТ ПРОФИЛЯ
+       ======================================================================== -->
+
+  <xs:element name="NsiProfileRoot" substitutionGroup="eskd-pi:ProfileRoot">
+    <xs:annotation>
+      <xs:documentation>
+        Корневой элемент профиля НСИ.
+        Наследует от абстрактного ProfileRoot через substitutionGroup.
+        Соответствует контракту профиля интероперабельности.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="eskd-pi:ProfileRootType">
+          <xs:sequence>
+            <!-- Доменные элементы профиля НСИ -->
+            <xs:element name="classifiers" minOccurs="0" maxOccurs="1">
+              <xs:annotation>
+                <xs:documentation>Классификаторы НСИ</xs:documentation>
+              </xs:annotation>
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element ref="eskd-nsi:classifier" minOccurs="0" maxOccurs="unbounded"/>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+            
+            <xs:element name="referenceBooks" minOccurs="0" maxOccurs="1">
+              <xs:annotation>
+                <xs:documentation>Справочники НСИ</xs:documentation>
+              </xs:annotation>
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element ref="eskd-nsi:referenceBook" minOccurs="0" maxOccurs="unbounded"/>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+            
+            <xs:element name="nsiMappings" minOccurs="0" maxOccurs="1">
+              <xs:annotation>
+                <xs:documentation>Маппинги между справочниками</xs:documentation>
+              </xs:annotation>
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element ref="eskd-nsi:nsi_mapping" minOccurs="0" maxOccurs="unbounded"/>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+  <!-- ========================================================================
+       КЛЮЧИ ДЛЯ ВАЛИДАЦИИ ССЫЛОК (XSD 1.1 key/keyref)
+       ======================================================================== -->
+
+  <xs:element name="NsiProfileRoot">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="eskd-pi:ProfileRootType">
+          <xs:sequence>
+            <xs:element name="classifiers" minOccurs="0">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element ref="eskd-nsi:classifier" maxOccurs="unbounded"/>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+            <xs:element name="referenceBooks" minOccurs="0">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element ref="eskd-nsi:referenceBook" maxOccurs="unbounded"/>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+            <xs:element name="nsiMappings" minOccurs="0">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element ref="eskd-nsi:nsi_mapping" maxOccurs="unbounded"/>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+
+    <!-- Ключи профиля -->
+    <xs:key name="NsiClassifierKey">
+      <xs:selector xpath="eskd-nsi:classifiers/eskd-nsi:classifier"/>
+      <xs:field xpath="@id"/>
+    </xs:key>
+
+    <xs:key name="NsiClassifierEntryKey">
+      <xs:selector xpath="eskd-nsi:classifiers/eskd-nsi:classifier/eskd-nsi:entries/eskd-nsi:entry"/>
+      <xs:field xpath="@id"/>
+    </xs:key>
+
+    <xs:key name="NsiReferenceBookKey">
+      <xs:selector xpath="eskd-nsi:referenceBooks/eskd-nsi:referenceBook"/>
+      <xs:field xpath="@id"/>
+    </xs:key>
+
+    <xs:key name="NsiReferenceRecordKey">
+      <xs:selector xpath="eskd-nsi:referenceBooks/eskd-nsi:referenceBook/eskd-nsi:records/eskd-nsi:record"/>
+      <xs:field xpath="@id"/>
+    </xs:key>
+
+    <xs:key name="NsiMappingKey">
+      <xs:selector xpath="eskd-nsi:nsiMappings/eskd-nsi:nsi_mapping"/>
+      <xs:field xpath="@id"/>
+    </xs:key>
+
+    <!-- Keyref: запись классификатора ссылается на родителя -->
+    <xs:keyref name="NsiEntry_ParentRef" refer="eskd-nsi:NsiClassifierEntryKey">
+      <xs:selector xpath="eskd-nsi:classifiers/eskd-nsi:classifier/eskd-nsi:entries/eskd-nsi:entry"/>
+      <xs:field xpath="eskd-nsi:parentCode"/>
+    </xs:keyref>
+
+    <!-- Keyref: владелец справочника -->
+    <xs:keyref name="NsiReference_OwnerRef" refer="eskd-bind:Binding_Organization2058Key">
+      <xs:selector xpath="eskd-nsi:referenceBooks/eskd-nsi:referenceBook"/>
+      <xs:field xpath="eskd-nsi:owner"/>
+    </xs:keyref>
+
+    <!-- Keyref: маппинг ссылается на записи -->
+    <xs:keyref name="NsiMapping_SourceRef" refer="eskd-nsi:NsiReferenceRecordKey">
+      <xs:selector xpath="eskd-nsi:nsiMappings/eskd-nsi:nsi_mapping/eskd-nsi:mappings/eskd-nsi:mapping"/>
+      <xs:field xpath="eskd-nsi:sourceRef"/>
+    </xs:keyref>
+
+    <xs:keyref name="NsiMapping_TargetRef" refer="eskd-nsi:NsiReferenceRecordKey">
+      <xs:selector xpath="eskd-nsi:nsiMappings/eskd-nsi:nsi_mapping/eskd-nsi:mappings/eskd-nsi:mapping"/>
+      <xs:field xpath="eskd-nsi:targetRef"/>
+    </xs:keyref>
+  </xs:element>
+
+  <!-- ========================================================================
+       ПРАВИЛА ВАЛИДАЦИИ (XSD 1.1 assert)
+       ======================================================================== -->
+
+  <xs:assert test="every $classifier in eskd-nsi:classifiers/eskd-nsi:classifier satisfies 
+                   (count($classifier/eskd-nsi:entries/eskd-nsi:entry) &gt; 0)">
+    <xs:annotation>
+      <xs:documentation>
+        Каждый классификатор должен содержать хотя бы одну запись.
+      </xs:documentation>
+    </xs:annotation>
+  </xs:assert>
+
+  <xs:assert test="every $reference in eskd-nsi:referenceBooks/eskd-nsi:referenceBook satisfies 
+                   (count($reference/eskd-nsi:records/eskd-nsi:record) &gt; 0)">
+    <xs:annotation>
+      <xs:documentation>
+        Каждый справочник должен содержать хотя бы одну запись.
+      </xs:documentation>
+    </xs:annotation>
+  </xs:assert>
+
+  <xs:assert test="every $entry in eskd-nsi:classifiers/eskd-nsi:classifier/eskd-nsi:entries/eskd-nsi:entry satisfies 
+                   (not($entry/eskd-nsi:parentCode) or 
+                    exists(//eskd-nsi:entry[@id = $entry/eskd-nsi:parentCode]))">
+    <xs:annotation>
+      <xs:documentation>
+        Если запись имеет родительский код, он должен ссылаться на существующую запись.
+      </xs:documentation>
+    </xs:annotation>
+  </xs:assert>
+
+  <xs:assert test="every $reference in eskd-nsi:referenceBooks/eskd-nsi:referenceBook satisfies 
+                   (not($reference/eskd-nsi:expirationDate) or 
+                    $reference/eskd-nsi:expirationDate &gt;= $reference/eskd-nsi:effectiveDate)">
+    <xs:annotation>
+      <xs:documentation>
+        Дата окончания действия справочника не может быть раньше даты вступления в силу.
+      </xs:documentation>
+    </xs:annotation>
+  </xs:assert>
+
+  <xs:assert test="every $record in eskd-nsi:referenceBooks/eskd-nsi:referenceBook/eskd-nsi:records/eskd-nsi:record satisfies 
+                   (count($record/eskd-nsi:attributes/eskd-nsi:attribute) &gt;= 1)">
+    <xs:annotation>
+      <xs:documentation>
+        Каждая запись справочника должна иметь хотя бы один атрибут.
+      </xs:documentation>
+    </xs:annotation>
+  </xs:assert>
+
+</xs:schema>

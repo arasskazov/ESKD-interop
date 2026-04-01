@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ============================================================================
+  КАТАЛОГ ПРОФИЛЕЙ ИНТЕРОПЕРАБЕЛЬНОСТИ
+  ============================================================================
+  Версия: 0.2
+  Основано на: ГОСТ Р 77.403
+  
+  Назначение:
+  Нормативное описание профилей интероперабельности без платформенных концепций.
+  Отличие от реестра: не содержит API endpoints, статусов, сервисов.
+  ============================================================================
+-->
+<ProfileCatalog xmlns="http://gost.ru/eskd/profile/catalog/2024"
+                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                catalogVersion="0.2"
+                lastUpdated="2025-01-15">
+
+  <annotation>
+    <documentation>
+      КАТАЛОГ ПРОФИЛЕЙ ИНТЕРОПЕРАБЕЛЬНОСТИ.
+      
+      Содержит:
+      - Нормативное описание профилей
+      - Требуемые модули
+      - Уровни интероперабельности
+      - Нормативные ссылки
+      
+      НЕ содержит:
+      - API endpoints
+      - Статусы активного/планируемого
+      - Сервисные концепции
+    </documentation>
+  </annotation>
+
+  <!-- =========================================================================
+       ПРОФИЛЬ 1: ЭКБ/РЭА
+       ========================================================================= -->
+  <Profile>
+    <ProfileId>ekb-rerea-1.0</ProfileId>
+    <ProfileName>Разрешённые перечни РЭА/ЭКБ</ProfileName>
+    <Description>
+      Обмен данными о разрешённых перечнях электронной компонентной базы (ЭКБ) 
+      и радиоэлектронной аппаратуры (РЭА). Включает проверку соответствия 
+      изделий разрешённым перечням, управление допустимыми заменами компонентов.
+    </Description>
+    <Namespace>http://gost.ru/eskd/profile/ekb/2024</Namespace>
+    <RootElement>EkbProfileRoot</RootElement>
+    <SchemaLocation>profile/eskd_profile_ekb.xsd</SchemaLocation>
+    <SchemaVersion>0.2</SchemaVersion>
+    <RequiredModules>
+      <Module>core/eskd_core.xsd</Module>
+      <Module>modules/eskd_2.525_module.xsd</Module>
+      <Module>modules/eskd_2.058_module.xsd</Module>
+      <Module>binding/eskd_binding.xsd</Module>
+    </RequiredModules>
+    <InteroperabilityLevels>
+      <Level id="A">
+        <Name>Базовый</Name>
+        <MinimumDegree>0.50</MinimumDegree>
+        <ExchangeStatus>Допустим для внутреннего обмена</ExchangeStatus>
+      </Level>
+      <Level id="B">
+        <Name>Расширенный</Name>
+        <MinimumDegree>0.75</MinimumDegree>
+        <ExchangeStatus>Допустим для межорганизационного обмена</ExchangeStatus>
+      </Level>
+      <Level id="C">
+        <Name>Полный</Name>
+        <MinimumDegree>0.95</MinimumDegree>
+        <ExchangeStatus>Рекомендуется для критичных данных</ExchangeStatus>
+      </Level>
+    </InteroperabilityLevels>
+    <SchematronRules>schematron/eskb-rerea-1.0.sch</SchematronRules>
+    <ApplicableLifecycleStages>
+      <Stage>S2_DEVELOPMENT</Stage>
+      <Stage>S3_PRODUCTION</Stage>
+      <Stage>S5_REPAIR</Stage>
+    </ApplicableLifecycleStages>
+    <ExternalReferences>
+      <Reference>ГОСТ Р 2.525-2024</Reference>
+      <Reference>ГОСТ Р 2.058-2023</Reference>
+      <Reference>ГОСТ Р 77.302</Reference>
+      <Reference>ГОСТ Р 77.403</Reference>
+    </ExternalReferences>
+    <Examples>
+      <Example>examples/ekb-rerea-1.0/example_ekb_profile.xml</Example>
+    </Examples>
+  </Profile>
+
+  <!-- =========================================================================
+       ПРОФИЛЬ 2: НСИ
+       ========================================================================= -->
+  <Profile>
+    <ProfileId>nsi-reference-1.0</ProfileId>
+    <ProfileName>Нормативно-справочная информация</ProfileName>
+    <Description>
+      Обмен классификаторами и справочниками между системами. 
+      Централизованное хранение критически важных данных организации, 
+      управление справочниками и классификаторами НСИ.
+    </Description>
+    <Namespace>http://gost.ru/eskd/profile/nsi/2024</Namespace>
+    <RootElement>NsiProfileRoot</RootElement>
+    <SchemaLocation>profile/eskd_profile_nsi.xsd</SchemaLocation>
+    <SchemaVersion>0.2</SchemaVersion>
+    <RequiredModules>
+      <Module>core/eskd_core.xsd</Module>
+      <Module>modules/eskd_2.525_module.xsd</Module>
+      <Module>modules/eskd_2.058_module.xsd</Module>
+    </RequiredModules>
+    <InteroperabilityLevels>
+      <Level id="A">
+        <Name>Базовый</Name>
+        <MinimumDegree>0.50</MinimumDegree>
+        <ExchangeStatus>Допустим для внутреннего обмена</ExchangeStatus>
+      </Level>
+      <Level id="B">
+        <Name>Расширенный</Name>
+        <MinimumDegree>0.75</MinimumDegree>
+        <ExchangeStatus>Допустим для межорганизационного обмена</ExchangeStatus>
+      </Level>
+      <Level id="C">
+        <Name>Полный</Name>
+        <MinimumDegree>0.95</MinimumDegree>
+        <ExchangeStatus>Рекомендуется для критичных данных</ExchangeStatus>
+      </Level>
+    </InteroperabilityLevels>
+    <ApplicableLifecycleStages>
+      <Stage>S1_RESEARCH</Stage>
+      <Stage>S2_DEVELOPMENT</Stage>
+      <Stage>S3_PRODUCTION</Stage>
+      <Stage>S4_OPERATION</Stage>
+    </ApplicableLifecycleStages>
+    <ExternalReferences>
+      <Reference>ГОСТ Р 77.302</Reference>
+      <Reference>ГОСТ Р 77.403</Reference>
+    </ExternalReferences>
+    <Examples>
+      <Example>examples/nsi-reference-1.0/example_nsi_profile.xml</Example>
+    </Examples>
+  </Profile>
+
+  <!-- =========================================================================
+       МЕТАДАННЫЕ КАТАЛОГА
+       ========================================================================= -->
+  <CatalogMetadata>
+    <CatalogId>gost-eskd-profiles-2024</CatalogId>
+    <CatalogName>Каталог профилей интероперабельности ЕСКД</CatalogName>
+    <CatalogVersion>0.2</CatalogVersion>
+    <Maintainer>
+      <Organization>ТК 482 "Интеграция данных"</Organization>
+      <Contact>tc482@gost.ru</Contact>
+    </Maintainer>
+    <LastUpdated>2025-01-15</LastUpdated>
+    <NextReview>2025-07-01</NextReview>
+    <TotalProfiles>2</TotalProfiles>
+    <UpdatePolicy>
+      <Frequency>quarterly</Frequency>
+      <NotificationEmail>profiles@gost.ru</NotificationEmail>
+    </UpdatePolicy>
+  </CatalogMetadata>
+
+</ProfileCatalog>

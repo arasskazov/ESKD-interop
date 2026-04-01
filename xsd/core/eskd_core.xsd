@@ -1,0 +1,551 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ============================================================================
+  БАЗОВЫЕ ТИПЫ ДАННЫХ (CORE)
+  ============================================================================
+  Основано на:
+  - ГОСТ Р 2.525-2024 (Электронная структура изделия)
+  - ГОСТ Р 2.058-2023 (Реквизитная часть КД)
+  - ГОСТ Р 77.302 (Общие данные об изделии)
+  
+  Назначение:
+  Базовые типы данных для профилей интероперабельности.
+  Не содержит платформенных концепций (API, сервисы, реестры).
+  ============================================================================
+-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:eskd-core="http://gost.ru/eskd/core/2024"
+           targetNamespace="http://gost.ru/eskd/core/2024"
+           elementFormDefault="qualified"
+           attributeFormDefault="unqualified"
+           version="0.2"
+           xml:lang="ru"
+           xmlns:vc="http://www.w3.org/2007/XMLSchema-versioning"
+           vc:minVersion="1.1">
+
+  <xs:annotation>
+    <xs:documentation>
+      БАЗОВЫЕ ТИПЫ ДАННЫХ ДЛЯ ПРОФИЛЕЙ ИНТЕРОПЕРАБЕЛЬНОСТИ.
+      
+      Содержит:
+      - Простые типы (идентификаторы, даты, числа, текст)
+      - Перечисления (статусы, категории)
+      - Группы атрибутов (переиспользуемые наборы атрибутов)
+      - Базовые complexType (для наследования в профилях)
+      
+      НЕ содержит:
+      - API-типы (ValidationRequest, ValidationResult)
+      - Сервисные концепции (SoftwareTool, реестры)
+      - Платформенные расширения
+    </xs:documentation>
+  </xs:annotation>
+
+  <!-- ========================================================================
+       РАЗДЕЛ 1: ПРОСТЫЕ ТИПЫ (ИДЕНТИФИКАТОРЫ)
+       ======================================================================== -->
+
+  <xs:simpleType name="GUID">
+    <xs:annotation>
+      <xs:documentation>Глобальный уникальный идентификатор (UUID v4)</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:pattern value="[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="InternalID">
+    <xs:annotation>
+      <xs:documentation>Внутренний идентификатор объекта (STEP-JSON стиль #N)</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:pattern value="#[0-9]+"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="Designator">
+    <xs:annotation>
+      <xs:documentation>Обозначение изделия/документа по ГОСТ 2.201</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:minLength value="1"/>
+      <xs:maxLength value="256"/>
+      <xs:pattern value="[A-ZА-Я0-9\.\-\s]+"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="CodeString">
+    <xs:annotation>
+      <xs:documentation>Кодовое значение (классификаторы, коды систем)</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:minLength value="1"/>
+      <xs:maxLength value="64"/>
+      <xs:pattern value="[A-Z0-9\-_]+"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="VersionString">
+    <xs:annotation>
+      <xs:documentation>Версия/ревизия (ГОСТ 2.525, 2.058)</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:pattern value="[0-9]+(\.[0-9]+)*[A-Z]*"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <!-- ========================================================================
+       РАЗДЕЛ 2: ДАТЫ И ВРЕМЯ (ISO 8601 + ГОСТ)
+       ======================================================================== -->
+
+  <xs:simpleType name="DateType">
+    <xs:annotation>
+      <xs:documentation>Дата в формате YYYY-MM-DD (ISO 8601, ГОСТ 7.1)</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:date">
+      <xs:pattern value="\d{4}-\d{2}-\d{2}"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="DateTimeType">
+    <xs:annotation>
+      <xs:documentation>Дата и время в формате YYYY-MM-DDThh:mm:ss (ISO 8601)</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:dateTime">
+      <xs:pattern value="\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="YearMonthType">
+    <xs:annotation>
+      <xs:documentation>Год и месяц в формате YYYY-MM</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:pattern value="\d{4}-\d{2}"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <!-- ========================================================================
+       РАЗДЕЛ 3: ЧИСЛОВЫЕ ТИПЫ
+       ======================================================================== -->
+
+  <xs:simpleType name="PositiveInteger">
+    <xs:annotation>
+      <xs:documentation>Положительное целое число (≥1)</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:integer">
+      <xs:minInclusive value="1"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="NonNegativeInteger">
+    <xs:annotation>
+      <xs:documentation>Неотрицательное целое число (≥0)</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:integer">
+      <xs:minInclusive value="0"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="RealNumber">
+    <xs:annotation>
+      <xs:documentation>Вещественное число (18 знаков, 6 после запятой, ISO 10303-41)</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:decimal">
+      <xs:totalDigits value="18"/>
+      <xs:fractionDigits value="6"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="PercentageType">
+    <xs:annotation>
+      <xs:documentation>Процентное значение (0.00 - 100.00)</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:decimal">
+      <xs:minInclusive value="0.00"/>
+      <xs:maxInclusive value="100.00"/>
+      <xs:fractionDigits value="2"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <!-- ========================================================================
+       РАЗДЕЛ 4: ТЕКСТОВЫЕ ТИПЫ
+       ======================================================================== -->
+
+  <xs:simpleType name="ShortText">
+    <xs:annotation>
+      <xs:documentation>Короткий текст (до 256 символов)</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:minLength value="1"/>
+      <xs:maxLength value="256"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="MediumText">
+    <xs:annotation>
+      <xs:documentation>Текст средней длины (до 1024 символов)</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:minLength value="0"/>
+      <xs:maxLength value="1024"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="LongText">
+    <xs:annotation>
+      <xs:documentation>Длинный текст (до 4096 символов)</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:minLength value="0"/>
+      <xs:maxLength value="4096"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="UnboundedText">
+    <xs:annotation>
+      <xs:documentation>Текст без ограничений длины</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string"/>
+  </xs:simpleType>
+
+  <!-- ========================================================================
+       РАЗДЕЛ 5: СТАДИИ ЖИЗНЕННОГО ЦИКЛА (ГОСТ Р 77.102)
+       ======================================================================== -->
+
+  <xs:simpleType name="LifecycleStageEnum">
+    <xs:annotation>
+      <xs:documentation>
+        Стадии жизненного цикла изделия по ГОСТ Р 77.102.
+        Используется для привязки профилей интероперабельности к стадиям ЖЦ.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="S1_RESEARCH">
+        <xs:annotation><xs:documentation>С1 - Исследование и обоснование разработки</xs:documentation></xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="S2_DEVELOPMENT">
+        <xs:annotation><xs:documentation>С2 - Разработка (ЭП, ТП, РКД)</xs:documentation></xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="S3_PRODUCTION">
+        <xs:annotation><xs:documentation>С3 - Производство (изготовление, испытания)</xs:documentation></xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="S4_OPERATION">
+        <xs:annotation><xs:documentation>С4 - Эксплуатация (применение по назначению)</xs:documentation></xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="S5_REPAIR">
+        <xs:annotation><xs:documentation>С5 - Капитальный ремонт (восстановление)</xs:documentation></xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="S6_UTILIZATION">
+        <xs:annotation><xs:documentation>С6 - Утилизация (снятие с эксплуатации, переработка)</xs:documentation></xs:annotation>
+      </xs:enumeration>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <!-- ========================================================================
+       РАЗДЕЛ 6: ПЕРЕЧИСЛЕНИЯ ДЛЯ ПРОФИЛЕЙ
+       ======================================================================== -->
+
+  <xs:simpleType name="ApprovalStatusEnum">
+    <xs:annotation>
+      <xs:documentation>Статус допуска компонента в разрешённый перечень</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="approved">
+        <xs:annotation><xs:documentation>Разрешён к применению</xs:documentation></xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="conditionally">
+        <xs:annotation><xs:documentation>Условно разрешён (с ограничениями)</xs:documentation></xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="restricted">
+        <xs:annotation><xs:documentation>Ограниченно допустим</xs:documentation></xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="deprecated">
+        <xs:annotation><xs:documentation>Не рекомендуется к новому применению</xs:documentation></xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="prohibited">
+        <xs:annotation><xs:documentation>Запрещён к применению</xs:documentation></xs:annotation>
+      </xs:enumeration>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="EquivalenceCategoryEnum">
+    <xs:annotation>
+      <xs:documentation>Категория эквивалентности компонента</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="original">
+        <xs:annotation><xs:documentation>Оригинальный компонент</xs:documentation></xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="domestic_analog">
+        <xs:annotation><xs:documentation>Отечественный аналог</xs:documentation></xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="foreign_analog">
+        <xs:annotation><xs:documentation>Иностранный аналог</xs:documentation></xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="functional_substitute">
+        <xs:annotation><xs:documentation>Функциональная замена</xs:documentation></xs:annotation>
+      </xs:enumeration>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="ComplianceLevelEnum">
+    <xs:annotation>
+      <xs:documentation>Уровень соответствия изделия разрешённому перечню</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="full">
+        <xs:annotation><xs:documentation>Полное соответствие</xs:documentation></xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="partial">
+        <xs:annotation><xs:documentation>Частичное соответствие (с исключениями)</xs:documentation></xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="not_verified">
+        <xs:annotation><xs:documentation>Не проверено</xs:documentation></xs:annotation>
+      </xs:enumeration>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <!-- ========================================================================
+       РАЗДЕЛ 7: ГРУППЫ АТРИБУТОВ (ПЕРЕИСПОЛЬЗУЕМЫЕ)
+       ======================================================================== -->
+
+  <xs:attributeGroup name="idAttGroup">
+    <xs:annotation>
+      <xs:documentation>Базовый атрибут идентификатора (XML ID)</xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="id" type="xs:ID" use="optional">
+      <xs:annotation><xs:documentation>Уникальный идентификатор в пределах документа</xs:documentation></xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+
+  <xs:attributeGroup name="guidAttGroup">
+    <xs:annotation>
+      <xs:documentation>Атрибут GUID для глобальной идентификации</xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="guid" type="eskd-core:GUID" use="optional">
+      <xs:annotation><xs:documentation>Глобальный уникальный идентификатор (UUID)</xs:documentation></xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+
+  <xs:attributeGroup name="refAttGroup">
+    <xs:annotation>
+      <xs:documentation>Атрибут ссылки на другой объект (XML IDREF)</xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="ref" type="xs:IDREF" use="optional">
+      <xs:annotation><xs:documentation>Ссылка на целевой объект</xs:documentation></xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+
+  <xs:attributeGroup name="changeAttGroup">
+    <xs:annotation>
+      <xs:documentation>
+        Атрибуты изменений (версионность, статус).
+        Используется для отслеживания истории изменений объектов.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="changeStatus" use="optional">
+      <xs:annotation><xs:documentation>Статус изменения объекта</xs:documentation></xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="new">
+            <xs:annotation><xs:documentation>Новый объект</xs:documentation></xs:annotation>
+          </xs:enumeration>
+          <xs:enumeration value="modified">
+            <xs:annotation><xs:documentation>Изменённый объект</xs:documentation></xs:annotation>
+          </xs:enumeration>
+          <xs:enumeration value="deleted">
+            <xs:annotation><xs:documentation>Удалённый объект</xs:documentation></xs:annotation>
+          </xs:enumeration>
+          <xs:enumeration value="unchanged">
+            <xs:annotation><xs:documentation>Без изменений</xs:documentation></xs:annotation>
+          </xs:enumeration>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="changeDate" type="eskd-core:DateTimeType" use="optional">
+      <xs:annotation><xs:documentation>Дата и время изменения</xs:documentation></xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="changeReason" type="eskd-core:MediumText" use="optional">
+      <xs:annotation><xs:documentation>Причина изменения</xs:documentation></xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="changeAuthor" type="eskd-core:ShortText" use="optional">
+      <xs:annotation><xs:documentation>Автор изменения (ФИО или ID пользователя)</xs:documentation></xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+
+  <xs:attributeGroup name="securityAttGroup">
+    <xs:annotation>
+      <xs:documentation>
+        Атрибуты безопасности и классификации.
+        Основано на ГОСТ Р 2.621 (ИЭТД) и требованиях к защите информации.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="securityClassification" use="optional">
+      <xs:annotation><xs:documentation>Гриф безопасности</xs:documentation></xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="UNCLASSIFIED">
+            <xs:annotation><xs:documentation>Открытые данные</xs:documentation></xs:annotation>
+          </xs:enumeration>
+          <xs:enumeration value="CONFIDENTIAL">
+            <xs:annotation><xs:documentation>Конфиденциально</xs:documentation></xs:annotation>
+          </xs:enumeration>
+          <xs:enumeration value="SECRET">
+            <xs:annotation><xs:documentation>Секретно</xs:documentation></xs:annotation>
+          </xs:enumeration>
+          <xs:enumeration value="TOP_SECRET">
+            <xs:annotation><xs:documentation>Совершенно секретно</xs:documentation></xs:annotation>
+          </xs:enumeration>
+          <xs:enumeration value="COMPANY_SENSITIVE">
+            <xs:annotation><xs:documentation>Внутреннее использование</xs:documentation></xs:annotation>
+          </xs:enumeration>
+          <xs:enumeration value="PROPRIETARY">
+            <xs:annotation><xs:documentation>Коммерческая тайна</xs:documentation></xs:annotation>
+          </xs:enumeration>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="caveat" type="eskd-core:CodeString" use="optional">
+      <xs:annotation><xs:documentation>Дополнительные ограничения (кодовое обозначение)</xs:documentation></xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="exportControl" type="xs:boolean" use="optional" default="false">
+      <xs:annotation><xs:documentation>Признак экспортного контроля (true = под контролем)</xs:documentation></xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+
+  <!-- ========================================================================
+       РАЗДЕЛ 8: АБСТРАКТНЫЕ БАЗОВЫЕ ТИПЫ (ДЛЯ НАСЛЕДОВАНИЯ)
+       ======================================================================== -->
+
+  <xs:complexType name="BaseEntityType" abstract="true">
+    <xs:annotation>
+      <xs:documentation>
+        Базовый тип для всех сущностей предметной области.
+        Все конкретные типы должны наследовать от этого типа.
+        Обеспечивает единый набор атрибутов для всех объектов.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="description" type="eskd-core:MediumText" minOccurs="0" maxOccurs="1">
+        <xs:annotation><xs:documentation>Описание сущности</xs:documentation></xs:annotation>
+      </xs:element>
+    </xs:sequence>
+    <xs:attributeGroup ref="eskd-core:idAttGroup"/>
+    <xs:attributeGroup ref="eskd-core:guidAttGroup"/>
+    <xs:attributeGroup ref="eskd-core:changeAttGroup"/>
+    <xs:attributeGroup ref="eskd-core:securityAttGroup"/>
+  </xs:complexType>
+
+  <xs:complexType name="BaseReferenceType" abstract="true">
+    <xs:annotation>
+      <xs:documentation>
+        Базовый тип для ссылок между объектами.
+        Совместимо с EXPRESS REFERENCES (ISO 10303).
+        Используется для полиморфных ссылок.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:sequence/>
+    <xs:attribute name="ref" type="xs:IDREF" use="required">
+      <xs:annotation><xs:documentation>Ссылка на целевой объект</xs:documentation></xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="refType" type="eskd-core:CodeString" use="optional">
+      <xs:annotation><xs:documentation>Тип целевого объекта (для полиморфных ссылок)</xs:documentation></xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+
+  <xs:complexType name="BaseDocumentType" abstract="true">
+    <xs:annotation>
+      <xs:documentation>
+        Базовый тип для документов.
+        Используется в ГОСТ Р 2.525-2024 и ГОСТ Р 2.058-2023.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="title" type="eskd-core:ShortText" minOccurs="1" maxOccurs="1">
+        <xs:annotation><xs:documentation>Наименование документа</xs:documentation></xs:annotation>
+      </xs:element>
+      <xs:element name="description" type="eskd-core:MediumText" minOccurs="0" maxOccurs="1">
+        <xs:annotation><xs:documentation>Описание документа</xs:documentation></xs:annotation>
+      </xs:element>
+    </xs:sequence>
+    <xs:attributeGroup ref="eskd-core:idAttGroup"/>
+    <xs:attributeGroup ref="eskd-core:guidAttGroup"/>
+    <xs:attributeGroup ref="eskd-core:changeAttGroup"/>
+    <xs:attributeGroup ref="eskd-core:securityAttGroup"/>
+  </xs:complexType>
+
+  <xs:complexType name="BaseOrganizationType" abstract="true">
+    <xs:annotation>
+      <xs:documentation>
+        Базовый тип для организаций.
+        Используется в обоих стандартах (2.525, 2.058).
+      </xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="name" type="eskd-core:ShortText" minOccurs="1" maxOccurs="1">
+        <xs:annotation><xs:documentation>Полное наименование организации</xs:documentation></xs:annotation>
+      </xs:element>
+      <xs:element name="shortName" type="eskd-core:ShortText" minOccurs="0" maxOccurs="1">
+        <xs:annotation><xs:documentation>Сокращённое наименование</xs:documentation></xs:annotation>
+      </xs:element>
+    </xs:sequence>
+    <xs:attributeGroup ref="eskd-core:idAttGroup"/>
+    <xs:attributeGroup ref="eskd-core:guidAttGroup"/>
+    <xs:attributeGroup ref="eskd-core:changeAttGroup"/>
+  </xs:complexType>
+
+  <xs:complexType name="BasePersonType" abstract="true">
+    <xs:annotation>
+      <xs:documentation>
+        Базовый тип для физических лиц.
+        Используется в ГОСТ Р 2.058-2023.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="lastName" type="eskd-core:ShortText" minOccurs="1" maxOccurs="1">
+        <xs:annotation><xs:documentation>Фамилия</xs:documentation></xs:annotation>
+      </xs:element>
+      <xs:element name="firstName" type="eskd-core:ShortText" minOccurs="1" maxOccurs="1">
+        <xs:annotation><xs:documentation>Имя</xs:documentation></xs:annotation>
+      </xs:element>
+      <xs:element name="patronymic" type="eskd-core:ShortText" minOccurs="0" maxOccurs="1">
+        <xs:annotation><xs:documentation>Отчество</xs:documentation></xs:annotation>
+      </xs:element>
+    </xs:sequence>
+    <xs:attributeGroup ref="eskd-core:idAttGroup"/>
+    <xs:attributeGroup ref="eskd-core:guidAttGroup"/>
+  </xs:complexType>
+
+  <xs:complexType name="BaseMeasureType" abstract="true">
+    <xs:annotation>
+      <xs:documentation>
+        Базовый тип для величин с единицами измерения.
+        Совместимо с ISO 10303-41 (measure_schema).
+      </xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="value" type="eskd-core:RealNumber" minOccurs="1" maxOccurs="1">
+        <xs:annotation><xs:documentation>Числовое значение величины</xs:documentation></xs:annotation>
+      </xs:element>
+      <xs:element name="unit" type="eskd-core:CodeString" minOccurs="1" maxOccurs="1">
+        <xs:annotation><xs:documentation>Код единицы измерения (ОКЕИ/ISO)</xs:documentation></xs:annotation>
+      </xs:element>
+    </xs:sequence>
+    <xs:attribute name="uncertainty" type="eskd-core:RealNumber" use="optional">
+      <xs:annotation><xs:documentation>Стандартная неопределённость измерения</xs:documentation></xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="measurementType" use="optional">
+      <xs:annotation><xs:documentation>Тип измерения</xs:documentation></xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="calculated"/>
+          <xs:enumeration value="measured"/>
+          <xs:enumeration value="maximum"/>
+          <xs:enumeration value="minimum"/>
+          <xs:enumeration value="nominal"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:complexType>
+
+</xs:schema>

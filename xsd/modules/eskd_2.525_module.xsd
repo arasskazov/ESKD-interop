@@ -1,0 +1,1534 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:eskd-core="http://gost.ru/eskd/core/2024"
+           xmlns:eskd-2525="http://gost.ru/eskd/2.525/2024"
+           targetNamespace="http://gost.ru/eskd/2.525/2024"
+           elementFormDefault="qualified"
+           attributeFormDefault="unqualified"
+           version="0.2"
+           xml:lang="ru"
+           xmlns:vc="http://www.w3.org/2007/XMLSchema-versioning"
+           vc:minVersion="1.1">
+
+  <xs:import namespace="http://gost.ru/eskd/core/2024"
+             schemaLocation="../core/eskd_core.xsd"/>
+
+  <xs:annotation>
+    <xs:documentation>
+      ============================================================================
+      МОДУЛЬ СТРУКТУРЫ ИЗДЕЛИЯ (ГОСТ Р 2.525-2024)
+      ============================================================================
+      Основано на:
+      - ГОСТ Р 2.525-2024 (Электронная структура изделия конструктивная)
+      - ГОСТ Р ИСО 10303-41 (Интегрированный обобщенный ресурс)
+      - ГОСТ Р ИСО 10303-44 (Конфигурация структуры изделия)
+      - ГОСТ Р 77.302 (Общие данные об изделии)
+      - ГОСТ Р 77.303 (Структура изделия)
+      
+      Этот модуль описывает содержательную часть ЭСК:
+      - Изделия и их версии
+      - Структуру изделия (вхождения компонентов)
+      - Документы и их связи с изделиями
+      - Организации и их роли
+      - Контексты описания изделия
+      ============================================================================
+    </xs:documentation>
+  </xs:annotation>
+
+  <!-- ========================================================================
+       РАЗДЕЛ 1: ПРОСТЫЕ ТИПЫ (СПЕЦИФИЧНЫЕ ДЛЯ 2.525)
+       ======================================================================== -->
+
+  <xs:simpleType name="MakeOrBuyEnum">
+    <xs:annotation>
+      <xs:documentation>
+        Классификация по разработке (ГОСТ Р 2.525-2024, табл. А.4).
+        Наследуется от product_definition_formation_with_specified_source (ISO 10303-44).
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value=".MADE.">
+        <xs:annotation><xs:documentation>Изготовленное</xs:documentation></xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value=".BOUGHT.">
+        <xs:annotation><xs:documentation>Покупное</xs:documentation></xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value=".COOPERATED.">
+        <xs:annotation><xs:documentation>Кооперированное</xs:documentation></xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value=".NOT_KNOWN.">
+        <xs:annotation><xs:documentation>Неизвестно</xs:documentation></xs:annotation>
+      </xs:enumeration>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="ProductTypeEnum">
+    <xs:annotation>
+      <xs:documentation>
+        Вид изделия (ГОСТ Р 2.525-2024, табл. А.2).
+        Соответствует ГОСТ 23945.0.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value=".PART.">
+        <xs:annotation><xs:documentation>Деталь</xs:documentation></xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value=".ASSEMBLY.">
+        <xs:annotation><xs:documentation>Сборочная единица</xs:documentation></xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value=".KIT.">
+        <xs:annotation><xs:documentation>Комплект</xs:documentation></xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value=".COMPLEX.">
+        <xs:annotation><xs:documentation>Комплекс</xs:documentation></xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value=".MATERIAL.">
+        <xs:annotation><xs:documentation>Материал</xs:documentation></xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value=".SOFTWARE.">
+        <xs:annotation><xs:documentation>Программное изделие</xs:documentation></xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value=".DATA.">
+        <xs:annotation><xs:documentation>Данные (база данных)</xs:documentation></xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value=".VIRTUAL.">
+        <xs:annotation><xs:documentation>Виртуальная сборочная единица</xs:documentation></xs:annotation>
+      </xs:enumeration>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="DocumentKindEnum">
+    <xs:annotation>
+      <xs:documentation>
+        Вид конструкторского документа по ГОСТ 2.102.
+        Используется для классификации документов в ЭСК.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="DRAWING">
+        <xs:annotation><xs:documentation>Чертеж</xs:documentation></xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="SPECIFICATION">
+        <xs:annotation><xs:documentation>Спецификация</xs:documentation></xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="TECHNICAL_CONDITIONS">
+        <xs:annotation><xs:documentation>Технические условия</xs:documentation></xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="OPERATION_MANUAL">
+        <xs:annotation><xs:documentation>Руководство по эксплуатации</xs:documentation></xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="CALCULATION">
+        <xs:annotation><xs:documentation>Расчет</xs:documentation></xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="EXPLANATORY_NOTE">
+        <xs:annotation><xs:documentation>Пояснительная записка</xs:documentation></xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="TECHNICAL_PROPOSAL">
+        <xs:annotation><xs:documentation>Техническое предложение</xs:documentation></xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="PRELIMINARY_DESIGN">
+        <xs:annotation><xs:documentation>Эскизный проект</xs:documentation></xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="TECHNICAL_DESIGN">
+        <xs:annotation><xs:documentation>Технический проект</xs:documentation></xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="WORKING_DOCUMENTATION">
+        <xs:annotation><xs:documentation>Рабочая документация</xs:documentation></xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="E_MODEL_ASSEMBLY">
+        <xs:annotation><xs:documentation>Электронная модель сборочной единицы (ЭМСБ)</xs:documentation></xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="E_MODEL_PART">
+        <xs:annotation><xs:documentation>Электронная модель детали (ЭМД)</xs:documentation></xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="OTHER">
+        <xs:annotation><xs:documentation>Другой вид документа</xs:documentation></xs:annotation>
+      </xs:enumeration>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="RepresentationTypeEnum">
+    <xs:annotation>
+      <xs:documentation>
+        Форма представления составной части документа (ГОСТ Р 2.525-2024, табл. А.12).
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="digital">
+        <xs:annotation><xs:documentation>Электронная форма</xs:documentation></xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="hard">
+        <xs:annotation><xs:documentation>Бумажная форма</xs:documentation></xs:annotation>
+      </xs:enumeration>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="ContextApplicationEnum">
+    <xs:annotation>
+      <xs:documentation>
+        Область применения контекста (ГОСТ Р 2.525-2024).
+        Используется для классификации контекстов описания изделия.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="OKPD2">
+        <xs:annotation><xs:documentation>ОКПД2 (Общероссийский классификатор продукции)</xs:documentation></xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="OKPS">
+        <xs:annotation><xs:documentation>ОКПС (Общероссийский классификатор продукции)</xs:documentation></xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="STRUCTURE_TYPE">
+        <xs:annotation><xs:documentation>Вид структуры</xs:documentation></xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="N/A">
+        <xs:annotation><xs:documentation>Классификация не применяется</xs:documentation></xs:annotation>
+      </xs:enumeration>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="OrganizationRoleEnum">
+    <xs:annotation>
+      <xs:documentation>
+        Роль организации по отношению к изделию (ГОСТ Р 2.525-2024, табл. А.14).
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="DESIGNER">
+        <xs:annotation><xs:documentation>Разработчик</xs:documentation></xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="MANUFACTURER">
+        <xs:annotation><xs:documentation>Изготовитель</xs:documentation></xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="SUPPLIER">
+        <xs:annotation><xs:documentation>Поставщик</xs:documentation></xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="OWNER">
+        <xs:annotation><xs:documentation>Владелец подлинников</xs:documentation></xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="MAINTAINER">
+        <xs:annotation><xs:documentation>Организация, осуществляющая техническое обслуживание</xs:documentation></xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="CUSTOMER">
+        <xs:annotation><xs:documentation>Заказчик</xs:documentation></xs:annotation>
+      </xs:enumeration>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <!-- ========================================================================
+       РАЗДЕЛ 2: ИЗДЕЛИЕ (PRODUCT)
+       ======================================================================== -->
+
+  <xs:complexType name="eskd_productType">
+    <xs:annotation>
+      <xs:documentation>
+        Изделие (eskd_product) — основной объект ЭСК.
+        Наследует от eskd-core:BaseEntityType.
+        ГОСТ Р 2.525-2024, табл. А.2.
+        
+        Соответствует:
+        - product (ISO 10303-41)
+        - eskd_product (расширение для ЕСКД)
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="eskd-core:BaseEntityType">
+        <xs:sequence>
+          <xs:element name="id" type="eskd-core:Designator" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>
+                Обозначение изделия (обязательно, ГОСТ 2.201).
+                Для сборочных единиц, комплексов, комплектов, деталей — обозначение по ГОСТ 2.201.
+                Для стандартных изделий — обозначение по стандарту.
+                Для покупных изделий — шифр, код или обозначение по документам поставки.
+              </xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="name" type="eskd-core:ShortText" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>
+                Наименование изделия (обязательно).
+                Для сборочных единиц, комплексов, комплектов, деталей — наименование по ГОСТ 2.201.
+                Для стандартных изделий — наименование по стандарту.
+                Для покупных изделий — наименование по документам поставки.
+              </xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="frame_of_reference" type="xs:IDREFS" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>
+                Область применения (ссылки на product_context).
+                Рекомендуется указывать один или несколько кодов в соответствии с применяемыми
+                классификаторами (ОКПД2, ОКПС и т.п.).
+                Может содержать более 1 значения.
+              </xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="product_type" type="eskd-2525:ProductTypeEnum" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>
+                Вид изделия (обязательно).
+                Возможные значения: part, assembly, kit, complex, material, software, data, virtual.
+              </xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="product_contexts" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>
+                Ссылки на контексты применения изделия.
+              </xs:documentation>
+            </xs:annotation>
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="context_ref" type="xs:IDREF" minOccurs="0" maxOccurs="unbounded"/>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:element name="eskd_product" type="eskd-2525:eskd_productType">
+    <xs:annotation>
+      <xs:documentation>Экземпляр изделия в ЭСК</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+
+  <!-- ========================================================================
+       РАЗДЕЛ 3: ВЕРСИЯ ИЗДЕЛИЯ (PRODUCT DEFINITION FORMATION)
+       ======================================================================== -->
+
+  <xs:complexType name="eskd_product_definition_formationType">
+    <xs:annotation>
+      <xs:documentation>
+        Версия изделия (eskd_product_definition_formation).
+        Наследует от product_definition_formation (ISO 10303-44).
+        ГОСТ Р 2.525-2024, рис. А.5, табл. А.4.
+        
+        Под версией изделия понимается вариант изделия, появившийся в результате
+        внесения изменений в конструкцию изделия, характер которых не требует
+        присвоения изделию нового обозначения (ГОСТ Р 2.503).
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="eskd-core:BaseEntityType">
+        <xs:sequence>
+          <xs:element name="id" type="eskd-core:VersionString" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>
+                Обозначение версии (номер изменения).
+                Например: "001", "002", "1.0", "А", "Б".
+              </xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="of_product" type="xs:IDREF" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>
+                Ссылка на изделие (eskd_product).
+                Определяет, к какому изделию относится данная версия.
+              </xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="make_or_buy" type="eskd-2525:MakeOrBuyEnum" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>
+                Классификация по разработке (обязательно).
+                Возможные значения: .MADE., .BOUGHT., .COOPERATED., .NOT_KNOWN.
+              </xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="standard" type="xs:boolean" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>
+                Признак стандартной продукции (обязательно).
+                TRUE = стандартное изделие, FALSE = не стандартное.
+              </xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:element name="eskd_product_definition_formation" type="eskd-2525:eskd_product_definition_formationType">
+    <xs:annotation>
+      <xs:documentation>Экземпляр версии изделия</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+
+  <!-- ========================================================================
+       РАЗДЕЛ 4: ОПИСАНИЕ ИЗДЕЛИЯ В КОНТЕКСТЕ (PRODUCT DEFINITION)
+       ======================================================================== -->
+
+  <xs:complexType name="product_definitionType">
+    <xs:annotation>
+      <xs:documentation>
+        Описание изделия в контексте (product_definition).
+        Наследует от eskd-core:BaseEntityType.
+        ГОСТ Р 2.525-2024, табл. А.7.
+        
+        Соответствует product_definition (ISO 10303-41).
+        В целях формирования ЭСК с каждой версией изделия должен быть связан
+        хотя бы один объект product_definition с frame_of_reference = "конструктивная структура".
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="eskd-core:BaseEntityType">
+        <xs:sequence>
+          <xs:element name="id" type="eskd-core:CodeString" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>
+                Идентификатор описания изделия в контексте.
+                Правила идентификации устанавливают в стандарте организации.
+                Пример: "EPS001", "EPS002".
+              </xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="formation" type="xs:IDREF" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>
+                Ссылка на версию изделия (eskd_product_definition_formation).
+                Определяет, к какой версии относится данное описание.
+              </xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="frame_of_reference" type="xs:IDREF" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>
+                Контекст описания изделия (product_definition_context).
+                Для ЭСК указывается "конструктивная структура изделия".
+              </xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:element name="product_definition" type="eskd-2525:product_definitionType">
+    <xs:annotation>
+      <xs:documentation>Экземпляр описания изделия в контексте</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+
+  <!-- ========================================================================
+       РАЗДЕЛ 5: КОНТЕКСТЫ (PRODUCT CONTEXT)
+       ======================================================================== -->
+
+  <xs:complexType name="product_contextType">
+    <xs:annotation>
+      <xs:documentation>
+        Контекст изделия (product_context).
+        Наследует от eskd-core:BaseEntityType.
+        ГОСТ Р 2.525-2024, табл. А.6.
+        
+        Соответствует product_context (ISO 10303-41).
+        Используется для классификации изделия по различным признакам.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="eskd-core:BaseEntityType">
+        <xs:sequence>
+          <xs:element name="id" type="eskd-core:CodeString" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Идентификатор контекста</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="application" type="eskd-2525:ContextApplicationEnum" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>
+                Область применения (ОКПД2, ОКПС, Вид структуры).
+              </xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="discipline_type" type="eskd-core:CodeString" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>
+                Код дисциплины (например, 28.94 для ОКПД2).
+              </xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="name" type="eskd-core:ShortText" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>
+                Наименование контекста.
+                Пример: "Части оборудования, не имеющие электрических соединений".
+              </xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:element name="product_context" type="eskd-2525:product_contextType">
+    <xs:annotation>
+      <xs:documentation>Экземпляр контекста изделия</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+
+  <xs:complexType name="product_definition_contextType">
+    <xs:annotation>
+      <xs:documentation>
+        Контекст описания изделия (product_definition_context).
+        Наследует от eskd-core:BaseEntityType.
+        ГОСТ Р 2.525-2024, табл. А.6.
+        
+        Соответствует product_definition_context (ISO 10303-41).
+        Для ЭСК используется единственный контекст "конструктивная структура".
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="eskd-core:BaseEntityType">
+        <xs:sequence>
+          <xs:element name="id" type="eskd-core:CodeString" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Идентификатор контекста описания</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="application" type="eskd-core:ShortText" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>
+                Область применения.
+                Пример: "Вид структуры".
+              </xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="life_cycle_stage" type="eskd-core:LifecycleStageEnum" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>
+                Стадия жизненного цикла (ГОСТ Р 77.102).
+                Пример: "конструктивная структура на этапе разработки РКД".
+              </xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="name" type="eskd-core:ShortText" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>
+                Наименование контекста описания.
+                Пример: "конструктивная структура".
+              </xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:element name="product_definition_context" type="eskd-2525:product_definition_contextType">
+    <xs:annotation>
+      <xs:documentation>Экземпляр контекста описания изделия</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+
+  <!-- ========================================================================
+       РАЗДЕЛ 6: СВЯЗИ МЕЖДУ ИЗДЕЛИЯМИ (PRODUCT RELATIONSHIP)
+       ======================================================================== -->
+
+  <xs:complexType name="product_relationshipType">
+    <xs:annotation>
+      <xs:documentation>
+        Связь между изделиями (product_relationship).
+        Наследует от eskd-core:BaseEntityType.
+        ГОСТ Р 2.525-2024, рис. А.3, табл. А.3.
+        
+        Соответствует product_relationship (ISO 10303-41).
+        Используется для связей разных типов (семейство изделий, аналоги и т.п.).
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="eskd-core:BaseEntityType">
+        <xs:sequence>
+          <xs:element name="id" type="eskd-core:CodeString" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Идентификатор связи</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="name" type="eskd-core:ShortText" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Наименование связи</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="relating_product" type="xs:IDREF" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Ссылка на исходное изделие</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="related_product" type="xs:IDREF" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Ссылка на связанное изделие</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="relationship_type" type="eskd-core:CodeString" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>
+                Тип связи.
+                Применяемые значения устанавливают в стандарте организации.
+              </xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="basis" type="eskd-core:MediumText" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Условия применения связи</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="definition" type="eskd-core:MediumText" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Описание связи</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:element name="product_relationship" type="eskd-2525:product_relationshipType">
+    <xs:annotation>
+      <xs:documentation>Экземпляр связи между изделиями</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+
+  <!-- ========================================================================
+       РАЗДЕЛ 7: СВЯЗИ МЕЖДУ ВЕРСИЯМИ (PRODUCT DEFINITION FORMATION RELATIONSHIP)
+       ======================================================================== -->
+
+  <xs:complexType name="product_definition_formation_relationshipType">
+    <xs:annotation>
+      <xs:documentation>
+        Связь между версиями изделия (product_definition_formation_relationship).
+        Наследует от eskd-core:BaseEntityType.
+        ГОСТ Р 2.525-2024, рис. А.6, табл. А.6.
+        
+        Соответствует product_definition_formation_relationship (ISO 10303-44).
+        Используется для связей между версиями (предыдущая, последующая, на основе).
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="eskd-core:BaseEntityType">
+        <xs:sequence>
+          <xs:element name="id" type="eskd-core:CodeString" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Идентификатор связи версий</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="name" type="eskd-core:ShortText" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Наименование связи</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="relating_product_definition_formation" type="xs:IDREF" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Ссылка на исходную версию изделия</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="related_product_definition_formation" type="xs:IDREF" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Ссылка на связанную версию изделия</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:element name="product_definition_formation_relationship" type="eskd-2525:product_definition_formation_relationshipType">
+    <xs:annotation>
+      <xs:documentation>Экземпляр связи между версиями изделия</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+
+  <!-- ========================================================================
+       РАЗДЕЛ 8: СТРУКТУРА ИЗДЕЛИЯ (ASSEMBLY COMPONENT USAGE)
+       ======================================================================== -->
+
+  <xs:complexType name="assembly_component_usageType">
+    <xs:annotation>
+      <xs:documentation>
+        Вхождение составной части (assembly_component_usage).
+        Наследует от eskd-core:BaseEntityType.
+        ГОСТ Р 2.525-2024, рис. А.11, табл. А.15.
+        
+        Соответствует assembly_component_usage (ISO 10303-44).
+        Используется для описания вхождения СЧ в изделие.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="eskd-core:BaseEntityType">
+        <xs:sequence>
+          <xs:element name="id" type="eskd-core:CodeString" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Идентификатор связи вхождения</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="name" type="eskd-core:ShortText" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Наименование связи</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="relating_product_definition" type="xs:IDREF" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>
+                Ссылка на описание родительского изделия (product_definition).
+              </xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="related_product_definition" type="xs:IDREF" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>
+                Ссылка на описание составной части (product_definition).
+              </xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="reference_designator" type="eskd-core:CodeString" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>
+                Обозначение позиции (reference designator).
+                Пример: "1", "2", "A1", "B2".
+              </xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:element name="assembly_component_usage" type="eskd-2525:assembly_component_usageType">
+    <xs:annotation>
+      <xs:documentation>Экземпляр вхождения составной части</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+
+  <xs:complexType name="next_assembly_usage_occurrenceType">
+    <xs:annotation>
+      <xs:documentation>
+        Вхождение в родительское изделие (next_assembly_usage_occurrence).
+        Наследует от assembly_component_usageType.
+        ГОСТ Р 2.525-2024, рис. А.11.
+        
+        Соответствует next_assembly_usage_occurrence (ISO 10303-44).
+        Не имеет дополнительных атрибутов.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="eskd-2525:assembly_component_usageType">
+        <xs:sequence/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:element name="next_assembly_usage_occurrence" type="eskd-2525:next_assembly_usage_occurrenceType">
+    <xs:annotation>
+      <xs:documentation>Экземпляр вхождения в родительское изделие</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+
+  <xs:complexType name="quantified_assembly_component_usageType">
+    <xs:annotation>
+      <xs:documentation>
+        Количественное вхождение составной части (quantified_assembly_component_usage).
+        Наследует от assembly_component_usageType.
+        ГОСТ Р 2.525-2024, рис. А.11.
+        
+        Соответствует quantified_assembly_component_usage (ISO 10303-44).
+        Добавляет атрибут quantity (количество с единицей измерения).
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="eskd-2525:assembly_component_usageType">
+        <xs:sequence>
+          <xs:element name="quantity" type="xs:IDREF" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>
+                Ссылка на measure_with_unit (количество).
+                Пример: "4 шт.", "0.4 м.".
+              </xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:element name="quantified_assembly_component_usage" type="eskd-2525:quantified_assembly_component_usageType">
+    <xs:annotation>
+      <xs:documentation>Экземпляр количественного вхождения составной части</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+
+  <!-- ========================================================================
+       РАЗДЕЛ 9: ЗАМЕНЫ СОСТАВНЫХ ЧАСТЕЙ (ASSEMBLY COMPONENT USAGE SUBSTITUTE)
+       ======================================================================== -->
+
+  <xs:complexType name="assembly_component_usage_substituteType">
+    <xs:annotation>
+      <xs:documentation>
+        Замена составной части (assembly_component_usage_substitute).
+        Наследует от eskd-core:BaseEntityType.
+        ГОСТ Р 2.525-2024, табл. А.16.
+        
+        Соответствует assembly_component_usage_substitute (ISO 10303-44).
+        Используется для описания допустимых замен в составе изделия.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="eskd-core:BaseEntityType">
+        <xs:sequence>
+          <xs:element name="id" type="eskd-core:CodeString" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Идентификатор замены</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="base" type="xs:IDREF" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>
+                Ссылка на основное вхождение СЧ (assembly_component_usage).
+              </xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="substitute" type="xs:IDREF" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>
+                Ссылка на вхождение заменяющей СЧ (assembly_component_usage).
+              </xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="ranking" type="eskd-core:PositiveInteger" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>
+                Приоритет использования (целое число).
+                1 = высший приоритет.
+              </xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="ranking_rationale" type="eskd-core:MediumText" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>
+                Дополнительные сведения по использованию данной замены.
+                Пример: "Применять с позициями... взамен позиции...".
+              </xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:element name="assembly_component_usage_substitute" type="eskd-2525:assembly_component_usage_substituteType">
+    <xs:annotation>
+      <xs:documentation>Экземпляр замены составной части</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+
+  <!-- ========================================================================
+       РАЗДЕЛ 10: МАТЕРИАЛЫ И ЗАГОТОВКИ (MAKE FROM USAGE OPTION)
+       ======================================================================== -->
+
+  <xs:complexType name="make_from_usage_optionType">
+    <xs:annotation>
+      <xs:documentation>
+        Требования к материалу/заготовке (make_from_usage_option).
+        Наследует от eskd-core:BaseEntityType.
+        ГОСТ Р 2.525-2024, табл. А.18.
+        
+        Соответствует make_from_usage_option (ISO 10303-44).
+        Используется для указания материала или заготовки для изготовления изделия.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="eskd-core:BaseEntityType">
+        <xs:sequence>
+          <xs:element name="id" type="eskd-core:CodeString" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Идентификатор связи с материалом</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="name" type="eskd-core:ShortText" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Наименование связи</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="relating_product_definition" type="xs:IDREF" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>
+                Ссылка на описание изделия (product_definition), для которого задается материал.
+              </xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="related_product_definition" type="xs:IDREF" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>
+                Ссылка на описание материала/заготовки (product_definition).
+              </xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="ranking" type="eskd-core:PositiveInteger" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Приоритет использования</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="quantity" type="xs:IDREF" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>
+                Ссылка на measure_with_unit (количество материала).
+                Пример: "0.32 кг".
+              </xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:element name="make_from_usage_option" type="eskd-2525:make_from_usage_optionType">
+    <xs:annotation>
+      <xs:documentation>Экземпляр требования к материалу/заготовке</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+
+  <!-- ========================================================================
+       РАЗДЕЛ 11: ДОКУМЕНТЫ (DOCUMENT)
+       ======================================================================== -->
+
+  <xs:complexType name="documentType">
+    <xs:annotation>
+      <xs:documentation>
+        Документ (document).
+        Наследует от eskd-core:BaseDocumentType.
+        ГОСТ Р 2.525-2024, табл. А.10.
+        
+        Соответствует document (ISO 10303-41).
+        Используется для описания конструкторских документов в ЭСК.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="eskd-core:BaseDocumentType">
+        <xs:sequence>
+          <xs:element name="id" type="eskd-core:Designator" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>
+                Обозначение документа (обязательно).
+                Для конструкторских документов — обозначение по ГОСТ 2.201.
+              </xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="kind" type="eskd-2525:DocumentKindEnum" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>
+                Вид документа (обязательно).
+                Возможные значения устанавливают в виде совокупности объектов
+                product_data_type на основании действующих в организации документов.
+              </xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:element name="document" type="eskd-2525:documentType">
+    <xs:annotation>
+      <xs:documentation>Экземпляр документа</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+
+  <xs:complexType name="eskd_document_versionType">
+    <xs:annotation>
+      <xs:documentation>
+        Версия электронного документа (eskd_document_version).
+        Наследует от eskd-core:BaseEntityType.
+        ГОСТ Р 2.525-2024, табл. А.11.
+        
+        Используется для описания версии или изменения документа.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="eskd-core:BaseEntityType">
+        <xs:sequence>
+          <xs:element name="id" type="eskd-core:CodeString" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Идентификатор версии</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="version" type="eskd-core:VersionString" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>
+                Обозначение версии электронного документа или номер изменения бумажного.
+                Пример: "001", "1.0", "И1", "И2".
+              </xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="items" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>
+                Ссылки на описания бумажных документов (книг, частей) или файлов,
+                составляющих электронный документ (версию).
+                Может содержать более одного значения.
+              </xs:documentation>
+            </xs:annotation>
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="item_ref" type="xs:IDREF" minOccurs="0" maxOccurs="unbounded"/>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:element name="eskd_document_version" type="eskd-2525:eskd_document_versionType">
+    <xs:annotation>
+      <xs:documentation>Экземпляр версии документа</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+
+  <xs:complexType name="eskd_document_itemType">
+    <xs:annotation>
+      <xs:documentation>
+        Составная часть документа (eskd_document_item).
+        Наследует от eskd-core:BaseEntityType.
+        ГОСТ Р 2.525-2024, табл. А.12.
+        
+        Используется для описания файлов или частей документа.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="eskd-core:BaseEntityType">
+        <xs:sequence>
+          <xs:element name="id" type="eskd-core:CodeString" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>
+                Обозначение составной части документа (версии).
+                Пример: имя файла, обозначение части или книги.
+              </xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="name" type="eskd-core:ShortText" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Наименование составной части</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="representation" type="eskd-2525:RepresentationTypeEnum" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>
+                Форма представления составной части документа (обязательно).
+                Возможные значения: digital (электронная), hard (бумажная).
+              </xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="data_type" type="eskd-core:CodeString" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>
+                Формат содержательной части электронного документа.
+                Пример: "PDF", "DWG", "STEP", "XML".
+              </xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="location" type="eskd-core:MediumText" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>
+                Место хранения подлинника документа.
+                Пример: "АС УДИ", "сервер", "архив".
+              </xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:element name="eskd_document_item" type="eskd-2525:eskd_document_itemType">
+    <xs:annotation>
+      <xs:documentation>Экземпляр составной части документа</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+
+  <xs:complexType name="document_product_associationType">
+    <xs:annotation>
+      <xs:documentation>
+        Связь документа с изделием (document_product_association).
+        Наследует от eskd-core:BaseEntityType.
+        ГОСТ Р 2.525-2024, табл. А.9.
+        
+        Соответствует document_product_association (ISO 10303-41).
+        Используется для связи изделия с конструкторским документом.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="eskd-core:BaseEntityType">
+        <xs:sequence>
+          <xs:element name="id" type="eskd-core:CodeString" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Идентификатор связи (обязательно)</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="related_product" type="xs:IDREF" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>
+                Ссылка на изделие, версию изделия или описание изделия в контексте
+                (объект eskd_product_select).
+              </xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="relating_document" type="xs:IDREF" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Ссылка на документ</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:element name="document_product_association" type="eskd-2525:document_product_associationType">
+    <xs:annotation>
+      <xs:documentation>Экземпляр связи документа с изделием</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+
+  <!-- ========================================================================
+       РАЗДЕЛ 12: ОРГАНИЗАЦИИ (ORGANIZATION)
+       ======================================================================== -->
+
+  <xs:complexType name="organizationType">
+    <xs:annotation>
+      <xs:documentation>
+        Организация (organization).
+        Наследует от eskd-core:BaseOrganizationType.
+        ГОСТ Р ИСО 10303-41, ГОСТ Р 2.525-2024.
+        
+        Соответствует organization (ISO 10303-41).
+        Используется для описания организаций, связанных с изделием.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="eskd-core:BaseOrganizationType">
+        <xs:sequence>
+          <xs:element name="id" type="eskd-core:CodeString" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>
+                Код организации (ИНН, внутренний код).
+                Пример: "АБВГ", "ЕКУЦ", "7725792300".
+              </xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:element name="organization" type="eskd-2525:organizationType">
+    <xs:annotation>
+      <xs:documentation>Экземпляр организации</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+
+  <xs:complexType name="organization_roleType">
+    <xs:annotation>
+      <xs:documentation>
+        Роль организации (organization_role).
+        Наследует от eskd-core:BaseEntityType.
+        ГОСТ Р 2.525-2024, рис. А.10.
+        
+        Используется для определения роли организации по отношению к изделию.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="eskd-core:BaseEntityType">
+        <xs:sequence>
+          <xs:element name="id" type="eskd-core:CodeString" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Идентификатор роли</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="name" type="eskd-2525:OrganizationRoleEnum" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>
+                Наименование роли.
+                Пример: Разработчик, Изготовитель, Поставщик, Владелец подлинников.
+              </xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:element name="organization_role" type="eskd-2525:organization_roleType">
+    <xs:annotation>
+      <xs:documentation>Экземпляр роли организации</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+
+  <xs:complexType name="eskd_organization_product_assignmentType">
+    <xs:annotation>
+      <xs:documentation>
+        Связь изделия с организацией (eskd_organization_product_assignment).
+        Наследует от eskd-core:BaseEntityType.
+        ГОСТ Р 2.525-2024, рис. А.10.
+        
+        Используется для установления связи изделия с организацией и её ролью.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="eskd-core:BaseEntityType">
+        <xs:sequence>
+          <xs:element name="id" type="eskd-core:CodeString" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Идентификатор назначения</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="assigned_product" type="xs:IDREF" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>
+                Ссылка на изделие (объект eskd_product_select).
+              </xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="assigned_organization" type="xs:IDREF" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Ссылка на организацию</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="role" type="xs:IDREF" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Ссылка на роль организации</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:element name="eskd_organization_product_assignment" type="eskd-2525:eskd_organization_product_assignmentType">
+    <xs:annotation>
+      <xs:documentation>Экземпляр связи изделия с организацией</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+
+  <!-- ========================================================================
+       РАЗДЕЛ 13: ЕДИНИЦЫ ИЗМЕРЕНИЯ (MEASURE WITH UNIT)
+       ======================================================================== -->
+
+  <xs:complexType name="measure_with_unitType">
+    <xs:annotation>
+      <xs:documentation>
+        Значение с единицей измерения (measure_with_unit).
+        Наследует от eskd-core:BaseMeasureType.
+        ГОСТ Р 2.525-2024, рис. А.14, табл. А.19.
+        
+        Соответствует measure_with_unit (ISO 10303-41).
+        Используется для указания количества, размеров и других величин.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="eskd-core:BaseMeasureType">
+        <xs:sequence>
+          <xs:element name="id" type="eskd-core:CodeString" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Идентификатор величины</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:element name="measure_with_unit" type="eskd-2525:measure_with_unitType">
+    <xs:annotation>
+      <xs:documentation>Экземпляр величины с единицей измерения</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+
+  <xs:complexType name="context_dependent_unitType">
+    <xs:annotation>
+      <xs:documentation>
+        Единица измерения (context_dependent_unit).
+        Наследует от eskd-core:BaseEntityType.
+        ГОСТ Р 2.525-2024, табл. А.20.
+        
+        Соответствует context_dependent_unit (ISO 10303-41).
+        Используется для описания единиц измерения (шт., м., кг. и т.п.).
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="eskd-core:BaseEntityType">
+        <xs:sequence>
+          <xs:element name="id" type="eskd-core:CodeString" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>
+                Обозначение единицы измерения (обязательно).
+                Пример: "шт.", "м.", "кг.", "мм.".
+              </xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="name" type="eskd-core:ShortText" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>
+                Наименование единицы измерения (обязательно).
+                Пример: "Штука", "Метр", "Килограмм", "Миллиметр".
+              </xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:element name="context_dependent_unit" type="eskd-2525:context_dependent_unitType">
+    <xs:annotation>
+      <xs:documentation>Экземпляр единицы измерения</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+
+  <!-- ========================================================================
+       РАЗДЕЛ 14: КОРНЕВОЙ ЭЛЕМЕНТ МОДУЛЯ
+       ======================================================================== -->
+
+  <xs:element name="ESKDStructure2525">
+    <xs:annotation>
+      <xs:documentation>
+        Корневой элемент для структуры изделия по ГОСТ Р 2.525-2024.
+        Содержит все объекты ЭСК.
+        Используется для самостоятельной валидации данных 2.525.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="metadata" minOccurs="1" maxOccurs="1">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="schemaVersion" type="eskd-core:VersionString" minOccurs="1" maxOccurs="1"/>
+              <xs:element name="creationDate" type="eskd-core:DateTimeType" minOccurs="1" maxOccurs="1"/>
+              <xs:element name="sourceSystem" type="eskd-core:ShortText" minOccurs="0" maxOccurs="1"/>
+              <xs:element name="exportedBy" type="eskd-core:ShortText" minOccurs="0" maxOccurs="1"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+
+        <xs:element name="products" minOccurs="0">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element ref="eskd-2525:eskd_product" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+
+        <xs:element name="productFormations" minOccurs="0">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element ref="eskd-2525:eskd_product_definition_formation" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+
+        <xs:element name="productDefinitions" minOccurs="0">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element ref="eskd-2525:product_definition" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+
+        <xs:element name="contexts" minOccurs="0">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element ref="eskd-2525:product_context" minOccurs="0" maxOccurs="unbounded"/>
+              <xs:element ref="eskd-2525:product_definition_context" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+
+        <xs:element name="productRelationships" minOccurs="0">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element ref="eskd-2525:product_relationship" minOccurs="0" maxOccurs="unbounded"/>
+              <xs:element ref="eskd-2525:product_definition_formation_relationship" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+
+        <xs:element name="structure" minOccurs="0">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element ref="eskd-2525:assembly_component_usage" minOccurs="0" maxOccurs="unbounded"/>
+              <xs:element ref="eskd-2525:next_assembly_usage_occurrence" minOccurs="0" maxOccurs="unbounded"/>
+              <xs:element ref="eskd-2525:quantified_assembly_component_usage" minOccurs="0" maxOccurs="unbounded"/>
+              <xs:element ref="eskd-2525:assembly_component_usage_substitute" minOccurs="0" maxOccurs="unbounded"/>
+              <xs:element ref="eskd-2525:make_from_usage_option" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+
+        <xs:element name="documents" minOccurs="0">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element ref="eskd-2525:document" minOccurs="0" maxOccurs="unbounded"/>
+              <xs:element ref="eskd-2525:eskd_document_version" minOccurs="0" maxOccurs="unbounded"/>
+              <xs:element ref="eskd-2525:eskd_document_item" minOccurs="0" maxOccurs="unbounded"/>
+              <xs:element ref="eskd-2525:document_product_association" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+
+        <xs:element name="organizations" minOccurs="0">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element ref="eskd-2525:organization" minOccurs="0" maxOccurs="unbounded"/>
+              <xs:element ref="eskd-2525:organization_role" minOccurs="0" maxOccurs="unbounded"/>
+              <xs:element ref="eskd-2525:eskd_organization_product_assignment" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+
+        <xs:element name="units" minOccurs="0">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element ref="eskd-2525:measure_with_unit" minOccurs="0" maxOccurs="unbounded"/>
+              <xs:element ref="eskd-2525:context_dependent_unit" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+
+    <!-- Ключи для валидации ссылок (XSD 1.1 key/keyref) -->
+    <xs:key name="ProductKey">
+      <xs:selector xpath="eskd-2525:products/eskd-2525:eskd_product"/>
+      <xs:field xpath="@id"/>
+    </xs:key>
+
+    <xs:key name="ProductFormationKey">
+      <xs:selector xpath="eskd-2525:productFormations/eskd-2525:eskd_product_definition_formation"/>
+      <xs:field xpath="@id"/>
+    </xs:key>
+
+    <xs:key name="ProductDefinitionKey">
+      <xs:selector xpath="eskd-2525:productDefinitions/eskd-2525:product_definition"/>
+      <xs:field xpath="@id"/>
+    </xs:key>
+
+    <xs:key name="ContextKey">
+      <xs:selector xpath="eskd-2525:contexts/eskd-2525:product_context | eskd-2525:contexts/eskd-2525:product_definition_context"/>
+      <xs:field xpath="@id"/>
+    </xs:key>
+
+    <xs:key name="DocumentKey">
+      <xs:selector xpath="eskd-2525:documents/eskd-2525:document"/>
+      <xs:field xpath="@id"/>
+    </xs:key>
+
+    <xs:key name="OrganizationKey">
+      <xs:selector xpath="eskd-2525:organizations/eskd-2525:organization"/>
+      <xs:field xpath="@id"/>
+    </xs:key>
+
+    <xs:key name="OrganizationRoleKey">
+      <xs:selector xpath="eskd-2525:organizations/eskd-2525:organization_role"/>
+      <xs:field xpath="@id"/>
+    </xs:key>
+
+    <xs:key name="UnitKey">
+      <xs:selector xpath="eskd-2525:units/eskd-2525:context_dependent_unit"/>
+      <xs:field xpath="@id"/>
+    </xs:key>
+
+    <xs:key name="MeasureKey">
+      <xs:selector xpath="eskd-2525:units/eskd-2525:measure_with_unit"/>
+      <xs:field xpath="@id"/>
+    </xs:key>
+
+    <!-- Ключи для ссылок (keyref) -->
+    <xs:keyref name="ProductRef" refer="eskd-2525:ProductKey">
+      <xs:selector xpath="eskd-2525:productFormations/eskd-2525:eskd_product_definition_formation"/>
+      <xs:field xpath="eskd-2525:of_product"/>
+    </xs:keyref>
+
+    <xs:keyref name="OrganizationRef" refer="eskd-2525:OrganizationKey">
+      <xs:selector xpath="eskd-2525:organizations/eskd-2525:eskd_organization_product_assignment"/>
+      <xs:field xpath="eskd-2525:assigned_organization"/>
+    </xs:keyref>
+
+    <xs:keyref name="ProductForOrgRef" refer="eskd-2525:ProductKey">
+      <xs:selector xpath="eskd-2525:organizations/eskd-2525:eskd_organization_product_assignment"/>
+      <xs:field xpath="eskd-2525:assigned_product"/>
+    </xs:keyref>
+
+    <xs:keyref name="UnitRef" refer="eskd-2525:UnitKey">
+      <xs:selector xpath="eskd-2525:units/eskd-2525:measure_with_unit"/>
+      <xs:field xpath="eskd-2525:unit_component"/>
+    </xs:keyref>
+  </xs:element>
+
+  <!-- Правила валидации (XSD 1.1 assert) -->
+  <xs:assert test="every $pd in eskd-2525:productDefinitions/eskd-2525:product_definition satisfies 
+                   (exists(eskd-2525:productFormations/eskd-2525:eskd_product_definition_formation[@id = $pd/eskd-2525:formation]))">
+    <xs:annotation>
+      <xs:documentation>
+        Каждое описание изделия должно ссылаться на существующую версию изделия.
+      </xs:documentation>
+    </xs:annotation>
+  </xs:assert>
+
+  <xs:assert test="every $usage in eskd-2525:structure/eskd-2525:next_assembly_usage_occurrence satisfies 
+                   (exists(eskd-2525:productDefinitions/eskd-2525:product_definition[@id = $usage/eskd-2525:relating_product_definition]) and 
+                    exists(eskd-2525:productDefinitions/eskd-2525:product_definition[@id = $usage/eskd-2525:related_product_definition]))">
+    <xs:annotation>
+      <xs:documentation>
+        Все вхождения компонентов должны ссылаться на существующие описания изделий.
+      </xs:documentation>
+    </xs:annotation>
+  </xs:assert>
+
+</xs:schema>

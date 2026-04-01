@@ -1,0 +1,349 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ============================================================================
+  СВЯЗЫВАНИЕ МОДУЛЕЙ (BINDING): ГОСТ Р 2.525-2024 ↔ ГОСТ Р 2.058-2023
+  ============================================================================
+  Основано на:
+  - ГОСТ Р 2.525-2024 (Электронная структура изделия)
+  - ГОСТ Р 2.058-2023 (Реквизитная часть КД)
+  - ГОСТ Р 77.302 (Общие данные об изделии)
+  
+  Назначение:
+  Маппинг между объектами ГОСТ Р 2.525-2024 и ГОСТ Р 2.058-2023.
+  Обеспечивает ссылочную целостность между структурой изделия и реквизитами.
+  
+  НЕ содержит:
+  - Платформенные концепции (linkedDocuments, bindingType)
+  - Сервисные расширения
+  - ApplicableStages в metadata
+  ============================================================================
+-->
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:eskd-core="http://gost.ru/eskd/core/2024"
+           xmlns:eskd-2525="http://gost.ru/eskd/2.525/2024"
+           xmlns:eskd-2058="http://gost.ru/eskd/2.058/2023"
+           xmlns:eskd-bind="http://gost.ru/eskd/binding/2024"
+           targetNamespace="http://gost.ru/eskd/binding/2024"
+           elementFormDefault="qualified"
+           attributeFormDefault="unqualified"
+           version="0.2"
+           xml:lang="ru"
+           xmlns:vc="http://www.w3.org/2007/XMLSchema-versioning"
+           vc:minVersion="1.1">
+
+  <xs:import namespace="http://gost.ru/eskd/core/2024"
+             schemaLocation="../core/eskd_core.xsd"/>
+  <xs:import namespace="http://gost.ru/eskd/2.525/2024"
+             schemaLocation="../modules/eskd_2.525_module.xsd"/>
+  <xs:import namespace="http://gost.ru/eskd/2.058/2023"
+             schemaLocation="../modules/eskd_2.058_module.xsd"/>
+
+  <xs:annotation>
+    <xs:documentation>
+      СВЯЗЫВАНИЕ МОДУЛЕЙ 2.525 И 2.058.
+      
+      Содержит:
+      - productToDocRequisiteMapping (изделие ↔ реквизиты)
+      - documentToDocRequisiteMapping (документ ↔ реквизиты)
+      - versionMapping (версия изделия ↔ версия документа)
+      - organizationMapping (организация 2.525 ↔ организация 2.058)
+      - Ключи key/keyref для валидации ссылок
+      - XSD 1.1 assert для бизнес-правил
+      
+      НЕ содержит:
+      - linkedDocuments (платформенная концепция)
+      - bindingType (платформенная концепция)
+      - applicableStages в metadata (избыточно)
+      - personSignatureMapping (перенесено в Schematron)
+    </xs:documentation>
+  </xs:annotation>
+
+  <!-- ========================================================================
+       РАЗДЕЛ 1: МАППИНГ МЕЖДУ СТАНДАРТАМИ
+       ======================================================================== -->
+
+  <xs:complexType name="StandardMappingType">
+    <xs:annotation>
+      <xs:documentation>
+        Таблица соответствия между объектами ГОСТ Р 2.525-2024 и ГОСТ Р 2.058-2023.
+        Используется для валидации целостности данных при обмене.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <!-- Маппинг: Изделие (2.525) ↔ Реквизиты документа (2.058) -->
+      <xs:element name="productToDocRequisiteMapping" minOccurs="0" maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:documentation>
+            Связь изделия с реквизитами документа.
+            Пример: изделие АБВГ.123456.001 ↔ документ АБВГ.123456.001 ЭМС
+          </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="productRef" type="xs:IDREF" minOccurs="1" maxOccurs="1">
+              <xs:annotation>
+                <xs:documentation>
+                  Ссылка на eskd_product (2.525).
+                </xs:documentation>
+              </xs:annotation>
+            </xs:element>
+            <xs:element name="docRequisiteRef" type="xs:IDREF" minOccurs="0" maxOccurs="1">
+              <xs:annotation>
+                <xs:documentation>
+                  Ссылка на doc_requisite (2.058).
+                  Может отсутствовать для виртуальных изделий.
+                </xs:documentation>
+              </xs:annotation>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <!-- Маппинг: Документ (2.525) ↔ Реквизиты (2.058) -->
+      <xs:element name="documentToDocRequisiteMapping" minOccurs="0" maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:documentation>
+            Связь документа из 2.525 с реквизитами из 2.058.
+            Критично для обеспечения целостности данных.
+          </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="documentRef" type="xs:IDREF" minOccurs="1" maxOccurs="1">
+              <xs:annotation>
+                <xs:documentation>
+                  Ссылка на document (2.525).
+                </xs:documentation>
+              </xs:annotation>
+            </xs:element>
+            <xs:element name="docRequisiteRef" type="xs:IDREF" minOccurs="1" maxOccurs="1">
+              <xs:annotation>
+                <xs:documentation>
+                  Ссылка на doc_requisite (2.058).
+                  Обязательно для всех конструкторских документов.
+                </xs:documentation>
+              </xs:annotation>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <!-- Маппинг: Версия изделия (2.525) ↔ Версия документа (2.058) -->
+      <xs:element name="versionMapping" minOccurs="0" maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:documentation>
+            Связь версий между 2.525 и 2.058.
+            Согласно ГОСТ Р 2.503, версия изделия может не совпадать с версией документа.
+          </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="productVersionRef" type="xs:IDREF" minOccurs="1" maxOccurs="1">
+              <xs:annotation>
+                <xs:documentation>
+                  Ссылка на eskd_product_definition_formation (2.525).
+                </xs:documentation>
+              </xs:annotation>
+            </xs:element>
+            <xs:element name="docVersionRef" type="xs:IDREF" minOccurs="0" maxOccurs="1">
+              <xs:annotation>
+                <xs:documentation>
+                  Ссылка на version (2.058).
+                  Может отсутствовать для стандартных изделий.
+                </xs:documentation>
+              </xs:annotation>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <!-- Маппинг: Организация (2.525) ↔ Организация (2.058) -->
+      <xs:element name="organizationMapping" minOccurs="0" maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:documentation>
+            Связь организаций между модулями.
+            Обеспечивает единство пространства организаций.
+          </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="organization2525Ref" type="xs:IDREF" minOccurs="0" maxOccurs="1">
+              <xs:annotation>
+                <xs:documentation>
+                  Ссылка на organization (2.525).
+                </xs:documentation>
+              </xs:annotation>
+            </xs:element>
+            <xs:element name="organization2058Ref" type="xs:IDREF" minOccurs="0" maxOccurs="1">
+              <xs:annotation>
+                <xs:documentation>
+                  Ссылка на organization (2.058).
+                  Содержит расширенную информацию (ИНН, КПП, адрес).
+                </xs:documentation>
+              </xs:annotation>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <!-- ========================================================================
+       РАЗДЕЛ 2: КОРНЕВОЙ ЭЛЕМЕНТ СВЯЗЫВАНИЯ
+       ======================================================================== -->
+
+  <xs:element name="ESKDBinding">
+    <xs:annotation>
+      <xs:documentation>
+        Корневой элемент связывания модулей 2.525 и 2.058.
+        Используется для валидации целостности данных при обмене.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <!-- Метаданные связывания (упрощённые) -->
+        <xs:element name="metadata" minOccurs="1" maxOccurs="1">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="schemaVersion" type="eskd-core:VersionString" minOccurs="1" maxOccurs="1"/>
+              <xs:element name="creationDate" type="eskd-core:DateTimeType" minOccurs="1" maxOccurs="1"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+
+        <!-- Маппинг между стандартами -->
+        <xs:element name="mapping" type="eskd-bind:StandardMappingType" minOccurs="0" maxOccurs="1"/>
+      </xs:sequence>
+    </xs:complexType>
+
+    <!-- ========================================================================
+         КЛЮЧИ ДЛЯ ВАЛИДАЦИИ ССЫЛОК (XSD 1.1 key/keyref)
+         ======================================================================== -->
+
+    <!-- Ключи для объектов 2.525 -->
+    <xs:key name="Binding_ProductKey">
+      <xs:selector xpath="//eskd-2525:eskd_product"/>
+      <xs:field xpath="@id"/>
+    </xs:key>
+
+    <xs:key name="Binding_DocumentKey">
+      <xs:selector xpath="//eskd-2525:document"/>
+      <xs:field xpath="@id"/>
+    </xs:key>
+
+    <xs:key name="Binding_ProductFormationKey">
+      <xs:selector xpath="//eskd-2525:eskd_product_definition_formation"/>
+      <xs:field xpath="@id"/>
+    </xs:key>
+
+    <xs:key name="Binding_Organization2525Key">
+      <xs:selector xpath="//eskd-2525:organization"/>
+      <xs:field xpath="@id"/>
+    </xs:key>
+
+    <!-- Ключи для объектов 2.058 -->
+    <xs:key name="Binding_DocRequisiteKey">
+      <xs:selector xpath="//eskd-2058:doc_requisite"/>
+      <xs:field xpath="@id"/>
+    </xs:key>
+
+    <xs:key name="Binding_VersionKey">
+      <xs:selector xpath="//eskd-2058:version"/>
+      <xs:field xpath="@id"/>
+    </xs:key>
+
+    <xs:key name="Binding_Organization2058Key">
+      <xs:selector xpath="//eskd-2058:organization"/>
+      <xs:field xpath="@id"/>
+    </xs:key>
+
+    <!-- Keyref: маппинг продукт ↔ реквизиты -->
+    <xs:keyref name="Binding_ProductToDocRequisiteRef" refer="eskd-bind:Binding_DocRequisiteKey">
+      <xs:selector xpath="eskd-bind:mapping/eskd-bind:productToDocRequisiteMapping"/>
+      <xs:field xpath="eskd-bind:docRequisiteRef"/>
+    </xs:keyref>
+
+    <xs:keyref name="Binding_ProductRef" refer="eskd-bind:Binding_ProductKey">
+      <xs:selector xpath="eskd-bind:mapping/eskd-bind:productToDocRequisiteMapping"/>
+      <xs:field xpath="eskd-bind:productRef"/>
+    </xs:keyref>
+
+    <!-- Keyref: маппинг документ ↔ реквизиты -->
+    <xs:keyref name="Binding_DocumentToDocRequisiteRef" refer="eskd-bind:Binding_DocRequisiteKey">
+      <xs:selector xpath="eskd-bind:mapping/eskd-bind:documentToDocRequisiteMapping"/>
+      <xs:field xpath="eskd-bind:docRequisiteRef"/>
+    </xs:keyref>
+
+    <xs:keyref name="Binding_DocumentRef" refer="eskd-bind:Binding_DocumentKey">
+      <xs:selector xpath="eskd-bind:mapping/eskd-bind:documentToDocRequisiteMapping"/>
+      <xs:field xpath="eskd-bind:documentRef"/>
+    </xs:keyref>
+
+    <!-- Keyref: маппинг версий -->
+    <xs:keyref name="Binding_ProductVersionRef" refer="eskd-bind:Binding_ProductFormationKey">
+      <xs:selector xpath="eskd-bind:mapping/eskd-bind:versionMapping"/>
+      <xs:field xpath="eskd-bind:productVersionRef"/>
+    </xs:keyref>
+
+    <xs:keyref name="Binding_DocVersionRef" refer="eskd-bind:Binding_VersionKey">
+      <xs:selector xpath="eskd-bind:mapping/eskd-bind:versionMapping"/>
+      <xs:field xpath="eskd-bind:docVersionRef"/>
+    </xs:keyref>
+
+    <!-- Keyref: маппинг организаций -->
+    <xs:keyref name="Binding_Organization2525Ref" refer="eskd-bind:Binding_Organization2525Key">
+      <xs:selector xpath="eskd-bind:mapping/eskd-bind:organizationMapping"/>
+      <xs:field xpath="eskd-bind:organization2525Ref"/>
+    </xs:keyref>
+
+    <xs:keyref name="Binding_Organization2058Ref" refer="eskd-bind:Binding_Organization2058Key">
+      <xs:selector xpath="eskd-bind:mapping/eskd-bind:organizationMapping"/>
+      <xs:field xpath="eskd-bind:organization2058Ref"/>
+    </xs:keyref>
+  </xs:element>
+
+  <!-- ========================================================================
+       РАЗДЕЛ 3: ПРАВИЛА ВАЛИДАЦИИ (XSD 1.1 assert)
+       ======================================================================== -->
+
+  <xs:assert test="every $mapping in eskd-bind:mapping/eskd-bind:documentToDocRequisiteMapping satisfies 
+                   (exists(//eskd-2525:document[@id = $mapping/eskd-bind:documentRef]) and 
+                    exists(//eskd-2058:doc_requisite[@id = $mapping/eskd-bind:docRequisiteRef]))">
+    <xs:annotation>
+      <xs:documentation>
+        Все маппинги документов должны ссылаться на существующие объекты в обоих стандартах.
+        Критично для обеспечения целостности данных.
+      </xs:documentation>
+    </xs:annotation>
+  </xs:assert>
+
+  <xs:assert test="every $mapping in eskd-bind:mapping/eskd-bind:productToDocRequisiteMapping satisfies 
+                   (exists(//eskd-2525:eskd_product[@id = $mapping/eskd-bind:productRef]))">
+    <xs:annotation>
+      <xs:documentation>
+        Все маппинги изделий должны ссылаться на существующие изделия (2.525).
+      </xs:documentation>
+    </xs:annotation>
+  </xs:assert>
+
+  <xs:assert test="every $orgMap in eskd-bind:mapping/eskd-bind:organizationMapping satisfies 
+                   ($orgMap/eskd-bind:organization2525Ref or $orgMap/eskd-bind:organization2058Ref)">
+    <xs:annotation>
+      <xs:documentation>
+        Маппинг организации должен ссылаться хотя бы на одну организацию.
+      </xs:documentation>
+    </xs:annotation>
+  </xs:assert>
+
+  <xs:assert test="every $docReq in //eskd-2058:doc_requisite satisfies 
+                   (exists(//eskd-2058:organization[@id = $docReq/eskd-2058:legal_owner]))">
+    <xs:annotation>
+      <xs:documentation>
+        Каждый реквизит документа должен ссылаться на существующего владельца подлинника.
+        Согласно ГОСТ Р 2.058-2023 (табл. 1).
+      </xs:documentation>
+    </xs:annotation>
+  </xs:assert>
+
+</xs:schema>
