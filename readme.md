@@ -34,13 +34,9 @@
 
 ---
 ##  Диаграмма сушностей, атрибутов, связей
-- Сокращенная:
-
-<img src="docs/REA_interop-ER-smpl.png" width="200" height="100">
-
-- Полная:
-
-<img src="docs/REA_interop-ER-full.png" width="200" height="100">  
+| Сокращенная | Полная |
+|---------|----------|
+| <img src="docs/REA_interop-ER-smpl.png" width="200" height="100"> | <img src="docs/REA_interop-ER-full.png" width="200" height="100"> |
 
 ## Структура репозитория
 
