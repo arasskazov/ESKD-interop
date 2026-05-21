@@ -4,6 +4,7 @@
            xmlns:eskd-bind="http://gost.ru/eskd/binding/2024"
            xmlns:eskd-pi="http://gost.ru/eskd/profile/interface/2024"
            xmlns:eskd-ekb="http://gost.ru/eskd/profile/ekb/2024"
+           xmlns:eskd-2124="http://gost.ru/eskd/2.124/2014"
            targetNamespace="http://gost.ru/eskd/profile/ekb/2024"
            elementFormDefault="qualified"
            attributeFormDefault="unqualified"
@@ -18,6 +19,8 @@
              schemaLocation="eskd_binding.xsd"/>
   <xs:import namespace="http://gost.ru/eskd/profile/interface/2024"
              schemaLocation="eskd_profile_interface.xsd"/>
+  <xs:import namespace="http://gost.ru/eskd/2.124/2014"
+             schemaLocation="../modules/eskd_2.124_module.xsd"/>
 
   <xs:annotation>
     <xs:documentation>
@@ -352,6 +355,27 @@
           <xs:element name="notes" type="eskd-core:LongText" minOccurs="0" maxOccurs="1">
             <xs:annotation>
               <xs:documentation>Дополнительные примечания</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <!-- Расширение по ГОСТ 2.124-2014 -->
+          <xs:element name="importData" type="eskd-2124:ImportedComponentDataType" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>
+                Данные об импортном компоненте (ГОСТ 2.124-2014).
+                Содержит информацию о сертификатах и разрешениях для импортных изделий.
+                Обязательно для компонентов иностранного производства.
+              </xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="approvalHistory" type="eskd-2124:ApprovalRouteType" minOccurs="0" maxOccurs="unbounded">
+            <xs:annotation>
+              <xs:documentation>
+                История согласования позиции (ГОСТ 2.124-2014).
+                Повторяющийся элемент для отслеживания всех этапов жизненного цикла согласования.
+                Каждый этап содержит дату, ответственное лицо и комментарий.
+              </xs:documentation>
             </xs:annotation>
           </xs:element>
         </xs:sequence>
