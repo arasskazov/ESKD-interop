@@ -1,0 +1,298 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:eskd-core="http://gost.ru/eskd/core/2024"
+           xmlns:eskd-2124="http://gost.ru/eskd/2.124/2014"
+           targetNamespace="http://gost.ru/eskd/2.124/2014"
+           elementFormDefault="qualified"
+           attributeFormDefault="unqualified"
+           version="1.0"
+           xml:lang="ru"
+           xmlns:vc="http://www.w3.org/2007/XMLSchema-versioning"
+           vc:minVersion="1.1">
+
+  <xs:import namespace="http://gost.ru/eskd/core/2024"
+             schemaLocation="../core/eskd_core.xsd"/>
+
+  <xs:annotation>
+    <xs:documentation>
+      ============================================================================
+      МОДУЛЬ ПОДДЕРЖКИ ГОСТ 2.124-2014 «ПОРЯДОК ПРИМЕНЕНИЯ ПОКУПНЫХ ИЗДЕЛИЙ»
+      ============================================================================
+      Основано на:
+      - ГОСТ 2.124-2014 (ЕСКД. Порядок применения покупных изделий)
+      
+      Этот модуль расширяет профиль интероперабельности ЭКБ/РЭА следующими возможностями:
+      - Описание процессов согласования позиций перечней (ApprovalRoute)
+      - Данные об импортных компонентах (ImportedComponentData)
+      
+      Требования ГОСТ 2.124-2014:
+      - Пункт 4.2: Покупные изделия должны проходить процедуру согласования применения
+      - Пункт 5.1: Для импортных изделий требуется документальное подтверждение
+      - Пункт 6.3: Должен быть зафиксирован ответственный за согласование
+      - Пункт 7.2: Требуется учёт этапов согласования и их дат
+      
+      Область применения:
+      - Управление жизненным циклом согласования позиций разрешённых перечней
+      - Учёт сертификатов и разрешений для импортных компонентов
+      - Отслеживание истории изменений статуса согласования
+      ============================================================================
+    </xs:documentation>
+  </xs:annotation>
+
+  <!-- ========================================================================
+       РАЗДЕЛ 1: ПРОСТЫЕ ТИПЫ (СТАТУСЫ СОГЛАСОВАНИЯ)
+       ======================================================================== -->
+
+  <xs:simpleType name="ApprovalStageEnum">
+    <xs:annotation>
+      <xs:documentation>
+        Этап согласования позиции перечня согласно ГОСТ 2.124-2014.
+        
+        Значения:
+        - draft: Черновик (первичное заполнение, не утверждено)
+        - under_review: На рассмотрении (передано на согласование)
+        - approved: Утверждено (прошло все этапы согласования)
+        - rejected: Отклонено (не прошло согласование, требуется доработка)
+        - voided: Аннулировано (утрата силы после утверждения)
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="draft">
+        <xs:annotation>
+          <xs:documentation>Черновик — первичное заполнение позиции, документация не передана на согласование</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="under_review">
+        <xs:annotation>
+          <xs:documentation>На рассмотрении — позиция передана ответственному лицу или комиссии для проверки</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="approved">
+        <xs:annotation>
+          <xs:documentation>Утверждено — позиция прошла все этапы согласования и включена в перечень</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="rejected">
+        <xs:annotation>
+          <xs:documentation>Отклонено — позиция не прошла согласование, требуется доработка или замена</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="voided">
+        <xs:annotation>
+          <xs:documentation>Аннулировано — ранее утверждённая позиция утратила силу (снята с производства, выявлены недостатки)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <!-- ========================================================================
+       РАЗДЕЛ 2: МАРШРУТ СОГЛАСОВАНИЯ (APPROVAL ROUTE)
+       ======================================================================== -->
+
+  <xs:complexType name="ApprovalRouteType">
+    <xs:annotation>
+      <xs:documentation>
+        Описание этапа жизненного цикла согласования позиции перечня.
+        
+        Согласно ГОСТ 2.124-2014 (пункты 6.3, 7.2):
+        - Каждый этап согласования должен быть задокументирован
+        - Должно быть указано ответственное лицо
+        - Должна быть зафиксирована дата перехода в этап
+        - При необходимости указывается комментарий
+        
+        Используется как повторяющийся элемент approvalHistory для отслеживания
+        полной истории согласования позиции перечня.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="stage" type="eskd-2124:ApprovalStageEnum" minOccurs="1" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>
+            Этап согласования (обязательно).
+            Определяет текущее состояние позиции в процессе согласования.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+
+      <xs:element name="date" type="eskd-core:DateType" minOccurs="1" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>
+            Дата перехода в данный этап (обязательно).
+            Формат: ГГГГ-ММ-ДД согласно ГОСТ 2.304.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+
+      <xs:element name="responsiblePerson" minOccurs="1" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>
+            Ответственное лицо за данный этап согласования (обязательно).
+            ФИО сотрудника или идентификатор пользователя в системе.
+            Согласно ГОСТ 2.124-2014 п. 6.3 — должно быть указано лицо,
+            ответственное за проверку и принятие решения.
+            
+            Используется eskd-core:BasePersonType для совместимости с
+            модулем 2.058 (person).
+          </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+          <xs:complexContent>
+            <xs:extension base="eskd-core:BasePersonType"/>
+          </xs:complexContent>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="comment" type="eskd-core:LongText" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>
+            Комментарий к этапу согласования (опционально).
+            Может содержать:
+            - Обоснование решения (для approved/rejected)
+            - Примечания ответственного лица
+            - Ссылки на дополнительные документы
+            - Требования к доработке (для rejected)
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:element name="approval_route" type="eskd-2124:ApprovalRouteType">
+    <xs:annotation>
+      <xs:documentation>Экземпляр маршрута согласования позиции перечня</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+
+  <!-- ========================================================================
+       РАЗДЕЛ 3: ДАННЫЕ ОБ ИМПОРТНОМ КОМПОНЕНТЕ (IMPORTED COMPONENT DATA)
+       ======================================================================== -->
+
+  <xs:complexType name="ImportedComponentDataType">
+    <xs:annotation>
+      <xs:documentation>
+        Блок данных для импортных позиций перечня.
+        
+        Согласно ГОСТ 2.124-2014 (пункт 5.1):
+        - Для покупных изделий иностранного производства требуется
+          документальное подтверждение возможности применения
+        - Должен быть указан номер сертификата или разрешения
+        - Должен быть указан орган, выдавший разрешение
+        - Рекомендуется ссылка на техническую документацию изготовителя
+        
+        Применяется только для компонентов с countryOfOrigin,
+        отличным от страны применения (Российская Федерация).
+      </xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="certificateNumber" type="eskd-core:CodeString" minOccurs="1" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>
+            Номер сертификата соответствия или разрешения на применение (обязательно).
+            Примеры:
+            - Номер сертификата соответствия ГОСТ Р
+            - Номер декларации о соответствии
+            - Номер разрешения Минпромторга
+            - Регистрационный номер в реестре российской промышленной продукции
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+
+      <xs:element name="certificateDate" type="eskd-core:DateType" minOccurs="1" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>
+            Дата выдачи сертификата или разрешения (обязательно).
+            Формат: ГГГГ-ММ-ДД согласно ГОСТ 2.304.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+
+      <xs:element name="issuingAuthority" minOccurs="1" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>
+            Орган, выдавший сертификат или разрешение (обязательно).
+            Полное наименование организации:
+            - Орган по сертификации
+            - Министерство промышленности и торговли
+            - Федеральная служба по аккредитации (Росаккредитация)
+            - Иной уполномоченный орган
+            
+            Используется eskd-core:BaseOrganizationType для совместимости с
+            модулем 2.058 (organization).
+          </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+          <xs:complexContent>
+            <xs:extension base="eskd-core:BaseOrganizationType"/>
+          </xs:complexContent>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="technicalDocumentation" type="eskd-core:LongText" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>
+            Ссылка на техническую документацию зарубежного изготовителя (опционально).
+            URI ресурса, где размещена документация:
+            - Даташит (datasheet)
+            - Спецификация (specification)
+            - Руководство по применению (application note)
+            - Сертификат качества изготовителя
+            
+            Рекомендуется использовать постоянные ссылки (PID, DOI) или
+            внутренние ссылки на систему управления документами.
+            
+            Примечание: Используется LongText для хранения URI в виде строки,
+            так как в core не определён отдельный тип URI.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:element name="imported_component_data" type="eskd-2124:ImportedComponentDataType">
+    <xs:annotation>
+      <xs:documentation>Экземпляр данных об импортном компоненте</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+
+  <!-- ========================================================================
+       РАЗДЕЛ 4: ГРУППА ДЛЯ РАСШИРЕНИЯ ALLOWED COMPONENT ITEM
+       ======================================================================== -->
+  
+  <xs:annotation>
+    <xs:documentation>
+      ============================================================================
+      ИНСТРУКЦИЯ ПО ПОДКЛЮЧЕНИЮ К ПРОФИЛЮ ESKD_PROFILE_EKB.XSD
+      ============================================================================
+      
+      Для использования данного модуля в профиле allowed_component_list:
+      
+      1. Добавьте import в начало eskd_profile_ekb.xsd:
+         &lt;xs:import namespace="http://gost.ru/eskd/2.124/2014"
+                    schemaLocation="modules/eskd_2.124_module.xsd"/&gt;
+      
+      2. Добавьте объявление xmlns в xs:schema:
+         xmlns:eskd-2124="http://gost.ru/eskd/2.124/2014"
+      
+      3. В комплексный тип AllowedComponentItemType (после элемента notes) добавьте:
+         
+         &lt;xs:element name="importData" type="eskd-2124:ImportedComponentDataType" 
+                    minOccurs="0" maxOccurs="1"&gt;
+           &lt;xs:annotation&gt;
+             &lt;xs:documentation&gt;Данные об импортном компоненте (ГОСТ 2.124-2014)&lt;/xs:documentation&gt;
+           &lt;/xs:annotation&gt;
+         &lt;/xs:element&gt;
+         
+         &lt;xs:element name="approvalHistory" type="eskd-2124:ApprovalRouteType" 
+                    minOccurs="0" maxOccurs="unbounded"&gt;
+           &lt;xs:annotation&gt;
+             &lt;xs:documentation&gt;История согласования позиции (ГОСТ 2.124-2014)&lt;/xs:documentation&gt;
+           &lt;/xs:annotation&gt;
+         &lt;/xs:element&gt;
+      
+      4. Все новые элементы являются опциональными (minOccurs="0") для обеспечения
+         обратной совместимости с существующими данными.
+      ============================================================================
+    </xs:documentation>
+  </xs:annotation>
+
+</xs:schema>
