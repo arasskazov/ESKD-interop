@@ -1,0 +1,350 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ============================================================================
+  МОДУЛЬ КЛАССИФИКАЦИИ КОНСТРУКТОРСКИХ ДОКУМЕНТОВ (ГОСТ 2.102-2023)
+  ============================================================================
+  Основано на:
+  - ГОСТ 2.102-2023 (ЕСКД. Виды и комплектность конструкторских документов)
+  - ГОСТ Р 2.058-2023 (Реквизитная часть)
+  
+  Этот модуль определяет:
+  - DocumentKindCodeEnum: перечень кодов видов документов (Таблица 1 ГОСТ 2.102-2023)
+  - StructureDocumentType: абстрактный тип для документов, определяющих структуру изделия
+  
+  Требования ГОСТ 2.102-2023:
+  - Таблица 1: Коды видов документов (СП, ЭСК, ВП, ВР, ПЭ3 и др.)
+  - Пункт 5.2.1: Спецификация (СП) является основным документом сборочной единицы
+  - Пункт 5.2.1.1: Электронная конструктивная структура (ЭСК) может выполнять 
+    функцию основного конструкторского документа наравне со спецификацией
+  - Пункт 5.3.4: Ведомость покупных изделий (ВП) применяется для составных частей
+  - Пункт 5.3.5: Ведомость разрешения применения (ВР) фиксирует допустимость применения
+  
+  Область применения:
+  - Классификация документов в профилях интероперабельности
+  - Валидация вида документа при обмене данными
+  - Поддержка электронных структур изделия (ЭСК) как альтернативы бумажным спецификациям
+  ============================================================================
+-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:eskd-core="http://gost.ru/eskd/core/2024"
+           xmlns:eskd-dc="http://gost.ru/eskd/docclass/2024"
+           targetNamespace="http://gost.ru/eskd/docclass/2024"
+           elementFormDefault="qualified"
+           attributeFormDefault="unqualified"
+           version="1.0"
+           xml:lang="ru"
+           xmlns:vc="http://www.w3.org/2007/XMLSchema-versioning"
+           vc:minVersion="1.1">
+
+  <xs:import namespace="http://gost.ru/eskd/core/2024"
+             schemaLocation="../core/eskd_core.xsd"/>
+
+  <xs:annotation>
+    <xs:documentation>
+      МОДУЛЬ КЛАССИФИКАЦИИ ДОКУМЕНТОВ (DOCUMENT CLASSIFICATION).
+      
+      Содержит:
+      - DocumentKindCodeEnum: коды видов документов по ГОСТ 2.102-2023
+      - StructureDocumentType: базовый тип для спецификаций и ЭСК
+      
+      Пространство имён: http://gost.ru/eskd/docclass/2024
+      Префикс: eskd-dc
+    </xs:documentation>
+  </xs:annotation>
+
+  <!-- ========================================================================
+       РАЗДЕЛ 1: КОДЫ ВИДОВ ДОКУМЕНТОВ (ГОСТ 2.102-2023, ТАБЛИЦА 1)
+       ======================================================================== -->
+
+  <xs:simpleType name="DocumentKindCodeEnum">
+    <xs:annotation>
+      <xs:documentation>
+        Перечень кодов видов конструкторских документов.
+        
+        Основание: ГОСТ 2.102-2023, Таблица 1 "Коды видов документов".
+        
+        Основные коды для профиля ЭКБ/РЭА:
+        - СП: Спецификация (текстовый документ, определяющий состав сборочной единицы)
+        - ЭСК: Электронная конструктивная структура изделия (электронный аналог спецификации)
+        - ВП: Ведомость покупных изделий (перечень покупных изделий в составе)
+        - ВР: Ведомость разрешения применения покупных изделий (документ о допустимости)
+        - ПЭ3: Перечень элементов (для электрических схем)
+        
+        Полная поддержка всех кодов из таблицы 1 обеспечивает совместимость
+        с любыми комплектами конструкторской документации.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <!-- Основные документы для состава изделия -->
+      <xs:enumeration value="СП">
+        <xs:annotation>
+          <xs:documentation>
+            Спецификация.
+            Текстовый конструкторский документ, содержащий перечень составных частей 
+            сборочной единицы, комплекса или комплекта.
+            (ГОСТ 2.102-2023, п. 5.2.1)
+          </xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      
+      <xs:enumeration value="ЭСК">
+        <xs:annotation>
+          <xs:documentation>
+            Электронная конструктивная структура изделия.
+            Электронный конструкторский документ, содержащий данные о конструктивной 
+            структуре изделия (составные части, связи, атрибуты).
+            Может выполнять функцию основного конструкторского документа 
+            наравне со спецификацией.
+            (ГОСТ 2.102-2023, п. 5.2.1.1; ГОСТ 2.053-2023)
+          </xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+
+      <!-- Ведомости -->
+      <xs:enumeration value="ВП">
+        <xs:annotation>
+          <xs:documentation>
+            Ведомость покупных изделий.
+            Текстовый документ, содержащий перечень покупных изделий, 
+            применяемых в составе изделия.
+            (ГОСТ 2.102-2023, п. 5.3.4)
+          </xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+
+      <xs:enumeration value="ВР">
+        <xs:annotation>
+          <xs:documentation>
+            Ведомость разрешения применения покупных изделий.
+            Документ, фиксирующий решение о допустимости применения 
+            конкретных покупных изделий в данном изделии.
+            Используется в процессах нормоконтроля и согласования ЭКБ.
+            (ГОСТ 2.102-2023, п. 5.3.5; ГОСТ 2.124-2014)
+          </xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+
+      <xs:enumeration value="ВО">
+        <xs:annotation>
+          <xs:documentation>
+            Ведомость содержания драгматериалов.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+
+      <xs:enumeration value="ВМ">
+        <xs:annotation>
+          <xs:documentation>
+            Ведомость монтажных соединений.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+
+      <!-- Документы для схем -->
+      <xs:enumeration value="ПЭ3">
+        <xs:annotation>
+          <xs:documentation>
+            Перечень элементов.
+            Документ, содержащий перечень элементов, входящих в схему, 
+            и их обозначения.
+            (ГОСТ 2.102-2023, п. 5.4.3)
+          </xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+
+      <xs:enumeration value="ПЛУ">
+        <xs:annotation>
+          <xs:documentation>
+            Перечень условий.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+
+      <!-- Чертежи и общие виды -->
+      <xs:enumeration value="СБ">
+        <xs:annotation>
+          <xs:documentation>
+            Сборочный чертеж.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+
+      <xs:enumeration value="Ч">
+        <xs:annotation>
+          <xs:documentation>
+            Чертеж детали.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+
+      <xs:enumeration value="ГЧ">
+        <xs:annotation>
+          <xs:documentation>
+            Габаритный чертеж.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+
+      <xs:enumeration value="МЧ">
+        <xs:annotation>
+          <xs:documentation>
+            Монтажный чертеж.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+
+      <!-- Технические условия и паспорта -->
+      <xs:enumeration value="ТУ">
+        <xs:annotation>
+          <xs:documentation>
+            Технические условия.
+            Текстовый документ, устанавливающий требования к изделию, 
+            не отражённые в других конструкторских документах.
+            (ГОСТ 2.102-2023, п. 5.5.1)
+          </xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+
+      <xs:enumeration value="ПС">
+        <xs:annotation>
+          <xs:documentation>
+            Паспорт.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+
+      <xs:enumeration value="РЭ">
+        <xs:annotation>
+          <xs:documentation>
+            Руководство по эксплуатации.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+
+      <!-- Прочие документы -->
+      <xs:enumeration value="Д">
+        <xs:annotation>
+          <xs:documentation>
+            Документ.
+            Общий код для документов, не имеющих специфического кода вида,
+            или для группировки различных документов.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+
+      <xs:enumeration value="ПМ">
+        <xs:annotation>
+          <xs:documentation>
+            Программа и методика испытаний.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+
+      <xs:enumeration value="ИМ">
+        <xs:annotation>
+          <xs:documentation>
+            Инструкция по монтажу.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+
+      <xs:enumeration value="ФО">
+        <xs:annotation>
+          <xs:documentation>
+            Формуляр.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      
+      <xs:enumeration value="ЭО">
+        <xs:annotation>
+          <xs:documentation>
+            Ведомость эксплуатационных документов.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <!-- ========================================================================
+       РАЗДЕЛ 2: ТИПЫ ДОКУМЕНТОВ СТРУКТУРЫ ИЗДЕЛИЯ
+       ======================================================================== -->
+
+  <xs:complexType name="StructureDocumentType" abstract="true">
+    <xs:annotation>
+      <xs:documentation>
+        Абстрактный тип "Документ структуры изделия".
+        
+        Базовый тип для документов, определяющих состав и структуру изделия.
+        Согласно ГОСТ 2.102-2023 (п. 5.2.1.1) и ГОСТ 2.053-2023, 
+        функцию основного документа структуры могут выполнять:
+        1. Спецификация (СП) — традиционный текстовый документ
+        2. Электронная конструктивная структура (ЭСК) — электронный документ
+        
+        Данный тип используется в ссылках (IDREF) там, где система должна 
+        поддерживать оба варианта документа структуры. Конкретный тип 
+        определяется реализацией (наследником).
+        
+        Наследует от eskd-core:BaseEntityType для обеспечения стандартных 
+        атрибутов идентификации (id, версия, владелец).
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="eskd-core:BaseEntityType">
+        <xs:sequence>
+          <xs:element name="documentKind" type="eskd-dc:DocumentKindCodeEnum" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>
+                Код вида документа.
+                Для наследников этого типа ожидаются значения:
+                - "СП" (Спецификация)
+                - "ЭСК" (Электронная конструктивная структура)
+              </xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="designation" type="eskd-core:DesignationString" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>
+                Обозначение документа.
+                Пример: "АБВГ.123456.001 СП" или "АБВГ.123456.001 ЭСК".
+              </xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="name" type="eskd-core:NameString" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>
+                Наименование документа.
+              </xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <!-- ========================================================================
+       ИНСТРУКЦИЯ ПО ИСПОЛЬЗОВАНИЮ
+       ======================================================================== -->
+  <xs:annotation>
+    <xs:documentation>
+      ИНСТРУКЦИЯ ПО ПОДКЛЮЧЕНИЮ:
+      
+      1. Импорт в eskd_profile_ekb.xsd:
+         &lt;xs:import namespace="http://gost.ru/eskd/docclass/2024"
+                    schemaLocation="modules/eskd_document_classification.xsd"/&gt;
+         
+      2. Использование кодов видов документов:
+         В типах, описывающих реквизиты документов (например, DocRequisite),
+         добавить элемент:
+         &lt;xs:element name="documentKindCode" type="eskd-dc:DocumentKindCodeEnum"/&gt;
+      
+      3. Ссылки на документы структуры:
+         При создании ссылок на спецификацию или ЭСК использовать IDREF,
+         указывая в комментариях, что целевой объект должен иметь тип,
+         совместимый со StructureDocumentType.
+    </xs:documentation>
+  </xs:annotation>
+
+</xs:schema>

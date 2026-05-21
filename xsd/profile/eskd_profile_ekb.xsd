@@ -5,6 +5,7 @@
            xmlns:eskd-pi="http://gost.ru/eskd/profile/interface/2024"
            xmlns:eskd-ekb="http://gost.ru/eskd/profile/ekb/2024"
            xmlns:eskd-2124="http://gost.ru/eskd/2.124/2014"
+           xmlns:eskd-dc="http://gost.ru/eskd/docclass/2024"
            targetNamespace="http://gost.ru/eskd/profile/ekb/2024"
            elementFormDefault="qualified"
            attributeFormDefault="unqualified"
@@ -14,13 +15,15 @@
            vc:minVersion="1.1">
 
   <xs:import namespace="http://gost.ru/eskd/core/2024"
-             schemalocation="../core/eskd_core.xsd"/>
+             schemaLocation="../core/eskd_core.xsd"/>
   <xs:import namespace="http://gost.ru/eskd/binding/2024"
-             schemaLocation="eskd_binding.xsd"/>
+             schemaLocation="../binding/eskd_binding.xsd"/>
   <xs:import namespace="http://gost.ru/eskd/profile/interface/2024"
              schemaLocation="eskd_profile_interface.xsd"/>
   <xs:import namespace="http://gost.ru/eskd/2.124/2014"
              schemaLocation="../modules/eskd_2.124_module.xsd"/>
+  <xs:import namespace="http://gost.ru/eskd/docclass/2024"
+             schemaLocation="../modules/eskd_document_classification.xsd"/>
 
   <xs:annotation>
     <xs:documentation>
@@ -248,6 +251,40 @@
               </xs:sequence>
             </xs:complexType>
           </xs:element>
+          
+          <!-- Расширение по ГОСТ 2.102-2023: связь с ведомостями -->
+          <xs:element name="purchasedItemsListRef" type="xs:IDREF" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>
+                Ссылка на ведомость покупных изделий (ВП).
+                
+                Согласно ГОСТ 2.102-2023 (п. 5.3.4), ведомость покупных изделий
+                содержит перечень всех покупных изделий, применяемых в составе изделия.
+                
+                Данный элемент обеспечивает связь между разрешённым перечнем ЭКБ/РЭА
+                и конструкторским документом типа "Ведомость покупных изделий" (код ВП).
+                
+                Целевой объект должен иметь documentKind = "ВП".
+              </xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element name="permissionListRef" type="xs:IDREF" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>
+                Ссылка на ведомость разрешения применения покупных изделий (ВР).
+                
+                Согласно ГОСТ 2.102-2023 (п. 5.3.5) и ГОСТ 2.124-2014,
+                ведомость разрешения применения фиксирует решение о допустимости
+                применения конкретных покупных изделий в данном изделии.
+                
+                Данный элемент обеспечивает трассируемость между разрешённым перечнем
+                и документом, утверждающим применение конкретных позиций.
+                
+                Целевой объект должен иметь documentKind = "ВР".
+              </xs:documentation>
+            </xs:annotation>
+          </xs:element>
         </xs:sequence>
       </xs:extension>
     </xs:complexContent>
@@ -375,6 +412,26 @@
                 История согласования позиции (ГОСТ 2.124-2014).
                 Повторяющийся элемент для отслеживания всех этапов жизненного цикла согласования.
                 Каждый этап содержит дату, ответственное лицо и комментарий.
+              </xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <!-- Расширение по ГОСТ 2.102-2023: связь с ведомостью разрешения применения -->
+          <xs:element name="permissionDocumentRef" type="xs:IDREF" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>
+                Ссылка на документ "Ведомость разрешения применения" (ВР) для данной позиции.
+                
+                Согласно ГОСТ 2.102-2023 (п. 5.3.5), ведомость разрешения применения
+                фиксирует решение о допустимости применения конкретного покупного изделия
+                в данном изделии.
+                
+                Данный элемент обеспечивает трассируемость между позицией разрешённого перечня
+                и конкретным документом, утверждающим применение этого компонента.
+                
+                Целевой объект должен иметь documentKind = "ВР".
+                Отличается от permissionListRef тем, что ссылается на документ уровня позиции,
+                а не всего перечня.
               </xs:documentation>
             </xs:annotation>
           </xs:element>
@@ -701,90 +758,55 @@
        КЛЮЧИ ДЛЯ ВАЛИДАЦИИ ССЫЛОК (XSD 1.1 key/keyref)
        ======================================================================== -->
 
-  <xs:element name="EkbProfileRoot">
-    <xs:complexType>
-      <xs:complexContent>
-        <xs:extension base="eskd-pi:ProfileRootType">
-          <xs:sequence>
-            <xs:element name="allowedComponentLists" minOccurs="0">
-              <xs:complexType>
-                <xs:sequence>
-                  <xs:element ref="eskd-ekb:allowed_component_list" maxOccurs="unbounded"/>
-                  <xs:element ref="eskd-ekb:allowed_component_item" maxOccurs="unbounded"/>
-                </xs:sequence>
-              </xs:complexType>
-            </xs:element>
-            <xs:element name="replacementGroups" minOccurs="0">
-              <xs:complexType>
-                <xs:sequence>
-                  <xs:element ref="eskd-ekb:replacement_group" maxOccurs="unbounded"/>
-                  <xs:element ref="eskd-ekb:replacement_item" maxOccurs="unbounded"/>
-                </xs:sequence>
-              </xs:complexType>
-            </xs:element>
-            <xs:element name="complianceAssertions" minOccurs="0">
-              <xs:complexType>
-                <xs:sequence>
-                  <xs:element ref="eskd-ekb:compliance_assertion" maxOccurs="unbounded"/>
-                </xs:sequence>
-              </xs:complexType>
-            </xs:element>
-          </xs:sequence>
-        </xs:extension>
-      </xs:complexContent>
-    </xs:complexType>
+  <xs:key name="EkbAllowedListKey">
+    <xs:selector xpath="eskd-ekb:allowedComponentLists/eskd-ekb:allowed_component_list"/>
+    <xs:field xpath="@id"/>
+  </xs:key>
 
-    <!-- Ключи профиля -->
-    <xs:key name="EkbAllowedListKey">
-      <xs:selector xpath="eskd-ekb:allowedComponentLists/eskd-ekb:allowed_component_list"/>
-      <xs:field xpath="@id"/>
-    </xs:key>
+  <xs:key name="EkbAllowedItemKey">
+    <xs:selector xpath="eskd-ekb:allowedComponentLists/eskd-ekb:allowed_component_item"/>
+    <xs:field xpath="@id"/>
+  </xs:key>
 
-    <xs:key name="EkbAllowedItemKey">
-      <xs:selector xpath="eskd-ekb:allowedComponentLists/eskd-ekb:allowed_component_item"/>
-      <xs:field xpath="@id"/>
-    </xs:key>
+  <xs:key name="EkbReplacementGroupKey">
+    <xs:selector xpath="eskd-ekb:replacementGroups/eskd-ekb:replacement_group"/>
+    <xs:field xpath="@id"/>
+  </xs:key>
 
-    <xs:key name="EkbReplacementGroupKey">
-      <xs:selector xpath="eskd-ekb:replacementGroups/eskd-ekb:replacement_group"/>
-      <xs:field xpath="@id"/>
-    </xs:key>
+  <xs:key name="EkbComplianceKey">
+    <xs:selector xpath="eskd-ekb:complianceAssertions/eskd-ekb:compliance_assertion"/>
+    <xs:field xpath="@id"/>
+  </xs:key>
 
-    <xs:key name="EkbComplianceKey">
-      <xs:selector xpath="eskd-ekb:complianceAssertions/eskd-ekb:compliance_assertion"/>
-      <xs:field xpath="@id"/>
-    </xs:key>
+  <!-- Keyref: компонент в позиции перечня -->
+  <xs:keyref name="EkbAllowedItem_ComponentRef" refer="eskd-bind:Binding_ProductKey">
+    <xs:selector xpath="eskd-ekb:allowedComponentLists/eskd-ekb:allowed_component_item"/>
+    <xs:field xpath="eskd-ekb:componentRef"/>
+  </xs:keyref>
 
-    <!-- Keyref: компонент в позиции перечня -->
-    <xs:keyref name="EkbAllowedItem_ComponentRef" refer="eskd-bind:Binding_ProductKey">
-      <xs:selector xpath="eskd-ekb:allowedComponentLists/eskd-ekb:allowed_component_item"/>
-      <xs:field xpath="eskd-ekb:componentRef"/>
-    </xs:keyref>
+  <!-- Keyref: замена ссылается на компонент -->
+  <xs:keyref name="EkbReplacement_ProductRef" refer="eskd-bind:Binding_ProductKey">
+    <xs:selector xpath="eskd-ekb:replacementGroups/eskd-ekb:replacement_item"/>
+    <xs:field xpath="eskd-ekb:replacementProductRef"/>
+  </xs:keyref>
 
-    <!-- Keyref: замена ссылается на компонент -->
-    <xs:keyref name="EkbReplacement_ProductRef" refer="eskd-bind:Binding_ProductKey">
-      <xs:selector xpath="eskd-ekb:replacementGroups/eskd-ekb:replacement_item"/>
-      <xs:field xpath="eskd-ekb:replacementProductRef"/>
-    </xs:keyref>
+  <!-- Keyref: декларация ссылается на изделие -->
+  <xs:keyref name="EkbCompliance_ProductRef" refer="eskd-bind:Binding_ProductKey">
+    <xs:selector xpath="eskd-ekb:complianceAssertions/eskd-ekb:compliance_assertion"/>
+    <xs:field xpath="eskd-ekb:productRef"/>
+  </xs:keyref>
 
-    <!-- Keyref: декларация ссылается на изделие -->
-    <xs:keyref name="EkbCompliance_ProductRef" refer="eskd-bind:Binding_ProductKey">
-      <xs:selector xpath="eskd-ekb:complianceAssertions/eskd-ekb:compliance_assertion"/>
-      <xs:field xpath="eskd-ekb:productRef"/>
-    </xs:keyref>
+  <!-- Keyref: декларация ссылается на перечень -->
+  <xs:keyref name="EkbCompliance_ListRef" refer="eskd-ekb:EkbAllowedListKey">
+    <xs:selector xpath="eskd-ekb:complianceAssertions/eskd-ekb:compliance_assertion"/>
+    <xs:field xpath="eskd-ekb:allowedListRef"/>
+  </xs:keyref>
 
-    <!-- Keyref: декларация ссылается на перечень -->
-    <xs:keyref name="EkbCompliance_ListRef" refer="eskd-ekb:EkbAllowedListKey">
-      <xs:selector xpath="eskd-ekb:complianceAssertions/eskd-ekb:compliance_assertion"/>
-      <xs:field xpath="eskd-ekb:allowedListRef"/>
-    </xs:keyref>
-
-    <!-- Keyref: орган утверждения -->
-    <xs:keyref name="EkbList_AuthorityRef" refer="eskd-bind:Binding_Organization2058Key">
-      <xs:selector xpath="eskd-ekb:allowedComponentLists/eskd-ekb:allowed_component_list"/>
-      <xs:field xpath="eskd-ekb:issuingAuthority"/>
-    </xs:keyref>
-  </xs:element>
+  <!-- Keyref: орган утверждения -->
+  <xs:keyref name="EkbList_AuthorityRef" refer="eskd-bind:Binding_Organization2058Key">
+    <xs:selector xpath="eskd-ekb:allowedComponentLists/eskd-ekb:allowed_component_list"/>
+    <xs:field xpath="eskd-ekb:issuingAuthority"/>
+  </xs:keyref>
 
   <!-- ========================================================================
        ПРАВИЛА ВАЛИДАЦИИ (XSD 1.1 assert)
